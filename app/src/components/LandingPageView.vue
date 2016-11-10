@@ -8,7 +8,7 @@
 <template>
   <div>
     <img src="./LandingPageView/assets/logo.png" alt="electron-vue">
-    <h1>Welcome, dummy</h1>
+    <h1>Welcome, dumb ass</h1>
     <h1>{{card}}</h1>
     <current-page></current-page>
     <versions></versions>
