@@ -8,7 +8,8 @@
 <template>
   <div>
     <img src="./LandingPageView/assets/logo.png" alt="electron-vue">
-    <h1>Welcome.</h1>
+    <h1>Welcome, dummy</h1>
+    <h1>{{card}}</h1>
     <current-page></current-page>
     <versions></versions>
     <links></links>
@@ -19,13 +20,37 @@
   import CurrentPage from './LandingPageView/CurrentPage'
   import Links from './LandingPageView/Links'
   import Versions from './LandingPageView/Versions'
+  import devices from '../smartcard'
 
   export default {
+    data () {
+      return {
+        card: 'No Reader'
+      }
+    },
     components: {
       CurrentPage,
       Links,
       Versions
     },
-    name: 'landing-page'
+    name: 'landing-page',
+    beforeCreate () {
+      let self = this
+      console.log('Landing')
+      devices.onActivated().then((event) => {
+        self.card = 'No Card'
+        let device = event.device
+        device.on('card-inserted', function (event) {
+          let card = event.card
+          self.card = card.getAtr()
+        })
+        device.on('card-removed', function (event) {
+          self.card = 'No Card'
+        })
+      })
+      devices.onDeactivated().then((event) => {
+        self.card = 'No Reader'
+      })
+    }
   }
 </script>

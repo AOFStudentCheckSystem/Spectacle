@@ -1004,10 +1004,6 @@ binary@^0.3.0:
     buffers "~0.1.1"
     chainsaw "~0.1.0"
 
-bindings@^1.1.0:
-  version "1.2.1"
-  resolved "https://registry.yarnpkg.com/bindings/-/bindings-1.2.1.tgz#14ad6113812d2d37d72e67b4cacb4bb726505f11"
-
 bl@^1.0.0, bl@~1.1.2:
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/bl/-/bl-1.1.2.tgz#fdca871a99713aa00d19e3bbba41c44787a65398"
@@ -1129,9 +1125,9 @@ buffers@~0.1.1:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/buffers/-/buffers-0.1.1.tgz#b24579c3bed4d6d396aeee6d9a8ae7f5482ab7bb"
 
-buffertools@^2.1.2:
+buffertools@AOFStudentCheckSystem/node-buffertools#master:
   version "2.1.4"
-  resolved "https://registry.yarnpkg.com/buffertools/-/buffertools-2.1.4.tgz#62d4e1584c0090a0c7d3587f25934a84b8b38de4"
+  resolved "https://codeload.github.com/AOFStudentCheckSystem/node-buffertools/tar.gz/1e7435335444d92128b0c50348ff21c5e1b8312d"
 
 builtin-modules@^1.0.0:
   version "1.1.1"
@@ -2150,7 +2146,14 @@ electron-packager@^8.0.0:
     sanitize-filename "^1.6.0"
     semver "^5.3.0"
 
-electron-rebuild:
+electron-prebuilt:
+  version "1.4.6"
+  resolved "https://registry.yarnpkg.com/electron-prebuilt/-/electron-prebuilt-1.4.6.tgz#d38df4df4aaad5ae616b30e6360b6e249c82c447"
+  dependencies:
+    electron-download "^3.0.1"
+    extract-zip "^1.0.3"
+
+electron-rebuild@^1.3.0:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/electron-rebuild/-/electron-rebuild-1.3.0.tgz#46fe6eda2fd9c05a74a9f207ad03adc97136de43"
   dependencies:
@@ -3246,6 +3249,10 @@ ieee754@^1.1.4:
 iferr@^0.1.5, iferr@~0.1.5:
   version "0.1.5"
   resolved "https://registry.yarnpkg.com/iferr/-/iferr-0.1.5.tgz#c60eed69e6d8fdb6b3104a1fcbca1c192dc5b501"
+
+ignore-loader@^0.1.1:
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/ignore-loader/-/ignore-loader-0.1.1.tgz#187c846c661afcdee269ef4c3f42c73888903334"
 
 ignore@^3.1.2:
   version "3.2.0"
@@ -4451,6 +4458,10 @@ node-libs-browser@^0.6.0:
     util "~0.10.3"
     vm-browserify "0.0.4"
 
+node-loader@^0.6.0:
+  version "0.6.0"
+  resolved "https://registry.yarnpkg.com/node-loader/-/node-loader-0.6.0.tgz#c797ef51095ed5859902b157f6384f6361e05ae8"
+
 node-pre-gyp@^0.6.29:
   version "0.6.31"
   resolved "https://registry.yarnpkg.com/node-pre-gyp/-/node-pre-gyp-0.6.31.tgz#d8a00ddaa301a940615dbcc8caad4024d58f6017"
@@ -4934,12 +4945,11 @@ pbkdf2-compat@2.0.1:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/pbkdf2-compat/-/pbkdf2-compat-2.0.1.tgz#b6e0c8fa99494d94e0511575802a59a5c142f288"
 
-pcsclite@^0.4.9:
+pcsclite@AOFStudentCheckSystem/node-pcsclite#master:
   version "0.4.10"
-  resolved "https://registry.yarnpkg.com/pcsclite/-/pcsclite-0.4.10.tgz#8b537803f35762571541951f320efc28c99cdd4b"
+  resolved "https://codeload.github.com/AOFStudentCheckSystem/node-pcsclite/tar.gz/4e9b8688b075488d7fabb81aa20848b4a99de3a5"
   dependencies:
-    bindings "^1.1.0"
-    buffertools "^2.1.2"
+    buffertools AOFStudentCheckSystem/node-buffertools#master
     nan "^2.2.1"
 
 pend@~1.2.0:
@@ -5944,13 +5954,13 @@ slide@^1.1.3, slide@^1.1.5, slide@~1.1.3, slide@~1.1.6:
   version "1.1.6"
   resolved "https://registry.yarnpkg.com/slide/-/slide-1.1.6.tgz#56eb027d65b4d2dce6cb2e2d32c4d4afc9e1d707"
 
-smartcard:
+"smartcard@https://github.com/AOFStudentCheckSystem/smartcard.git":
   version "1.0.16"
-  resolved "https://registry.yarnpkg.com/smartcard/-/smartcard-1.0.16.tgz#08d7ef936b6eb49f96a007f04482b65cd62c4931"
+  resolved "https://github.com/AOFStudentCheckSystem/smartcard.git#12a46635b25eeae3e4971137b79b8ffa838a497c"
   dependencies:
     core-js "^2.4.0"
     hexify "^1.0.1"
-    pcsclite "^0.4.9"
+    pcsclite AOFStudentCheckSystem/node-pcsclite#master
 
 snake-case@^2.1.0:
   version "2.1.0"

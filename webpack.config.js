@@ -41,6 +41,14 @@ let config = {
         loader: 'vue-loader'
       },
       {
+        test: /\.node$/,
+        loader: 'node-loader'
+      },
+      {
+        test: /\.md$/,
+        loader: 'ignore-loader'
+      },
+      {
         test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
         loader: 'url-loader',
         query: {
