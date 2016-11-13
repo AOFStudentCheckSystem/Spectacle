@@ -21,8 +21,10 @@ function createWindow () {
    * Initial window options
    */
   mainWindow = new BrowserWindow({
-    height: 600,
-    width: 800
+    height: 768,
+    width: 1024 * 2,
+    frame: false,
+    titleBarStyle: 'hidden-inset'
   })
 
   mainWindow.loadURL(config.url)

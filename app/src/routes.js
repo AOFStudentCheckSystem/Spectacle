@@ -1,8 +1,13 @@
 export default [
   {
     path: '/',
-    name: 'landing-page',
-    component: require('components/LandingPageView')
+    name: 'control-panel',
+    component: require('components/ControlPanel')
+  },
+  {
+    path: '/portal',
+    name: 'sign-in',
+    component: require('components/SignIn')
   },
   {
     path: '*',

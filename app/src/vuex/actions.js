@@ -7,3 +7,7 @@ export const decrementMain = ({ commit }) => {
 export const incrementMain = ({ commit }) => {
   commit(types.INCREMENT_MAIN_COUNTER)
 }
+
+export const setCard = ({commit}, payload) => {
+  commit(types.SET_CARD_ATR, payload)
+}
