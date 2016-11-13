@@ -1,24 +1,30 @@
 # spectacle
 
-> The awesome swiss army knife for checking in students.
+> The awesome swiss army knife for counting numbers
 
 ## Build Setup
 
 ``` bash
+# install yarn
+npm install -g yarn
+
 # install dependencies
-npm install
+yarn install
+
+# rebuild natives
+yarn rebuild
 
 # serve with hot reload at localhost:9080
-npm run dev
+yarn dev
 
 # build electron app for production
-npm run build
+yarn build
 
 # lint all JS/Vue component files in `app/src`
-npm run lint
+yarn lint
 
 # run webpack in production
-npm run pack
+yarn pack
 ```
 More information can be found [here](https://simulatedgreg.gitbooks.io/electron-vue/content/docs/npm_scripts.html).
 
