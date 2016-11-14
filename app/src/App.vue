@@ -2,8 +2,12 @@
   @import url(https://fonts.googleapis.com/css?family=Lato:300);
 
   * {
-    margin: 0;
+    /*margin: 0;*/
     padding: 0;
+  }
+
+  *:focus {
+    outline:none !important;
   }
 
   html,
@@ -12,14 +16,15 @@
   }
 
   body {
+    overflow: hidden;
     -webkit-user-select: none;
     align-items: center;
     background: radial-gradient(
             ellipse at center,
             rgba(255, 255, 255, 1) 0%,
             rgba(229, 229, 229, .85) 100%
-    );
-    background-position: center;
+    ), center;
+    /*background-position: center;*/
     display: flex;
     font-family: Lato, Helvetica, sans-serif;
     justify-content: center;
@@ -49,23 +54,41 @@
     opacity: 0;
     -webkit-transform: translate(100px, 0);
     transform: translate(100px, 0);
-    transition: opacity .5s ease;
+    transition: opacity .2s ease;
   }
 
   .slide-left-leave-active, .slide-right-enter {
     opacity: 0;
     -webkit-transform: translate(-100px, 0);
     transform: translate(-100px, 0);
-    transition: opacity .4s ease;
+    transition: opacity .2s ease;
   }
 
   .child-transition {
-    transition: all .4s cubic-bezier(.55, 0, .1, 1);
+    transition: all .4s ease; /* cubic-bezier(.55, 0, .1, 1) */
   }
 
-  /*.navbar-inverse {*/
-  /*width: 100%;*/
+  /*@media screen and (max-width: 300px){*/
+    /*.main-view {*/
+      /*margin-top: 100px;*/
+    /*}*/
   /*}*/
+
+  /*@media screen and (max-width: 768px) and (min-width: 300px){*/
+    /*.main-view {*/
+      /*margin-top: 100px;*/
+    /*}*/
+  /*}*/
+
+  /*@media screen and (min-width: 768px){*/
+    /*.main-view {*/
+      /*margin-top: 100px;*/
+    /*}*/
+  /*}*/
+
+  .main-view {
+    padding-top: 100px;
+  }
 </style>
 
 <template>
@@ -74,7 +97,7 @@
       <a class="navbar-center navbar-brand">Spectacle</a>
       <div class="container-fluid">
         <div class="navbar-header">
-          <div class="navbar-brand" v-show="backEnabled">
+          <div class="navbar-brand" v-show="backEnabled" v-on:click="back()">
             <i class="fa fa-arrow-left" aria-hidden="true"></i>
             Back
           </div>
@@ -86,16 +109,21 @@
       </div>
     </nav>
     <transition :name="transitionName" mode="out-in">
-      <router-view class="child-transition"></router-view>
+      <router-view class="child-transition main-view"></router-view>
     </transition>
+    <global-notifications class="hidden-xs"></global-notifications>
   </div>
 </template>
 
 <script>
   import store from './vuex/store'
+  import GlobalNotifications from './components/GlobalNotifications'
 
   export default {
     store,
+    components: {
+      GlobalNotifications
+    },
     data () {
       return {
         transitionName: 'slide-left',
@@ -108,6 +136,9 @@
           store.dispatch('signOut')
           this.$router.replace('/portal')
         }
+      },
+      back () {
+        this.$router.go(-1)
       }
     },
     computed: {

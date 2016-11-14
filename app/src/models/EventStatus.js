@@ -2,8 +2,20 @@
  * Created by dummy on 11/10/16.
  */
 export let EventStatus = {
-  OFFLINE: -1,
-  PLANNED: 0,
-  BOARDING: 1,
-  COMPLETE: 2
+  OFFLINE: {
+    value: -1,
+    text: 'Offline'
+  },
+  PLANNED: {
+    value: 0,
+    text: 'Planned'
+  },
+  BOARDING: {
+    value: 1,
+    text: 'Boarding'
+  },
+  COMPLETE: {
+    value: 2,
+    text: 'Complete'
+  }
 }

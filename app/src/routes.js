@@ -5,6 +5,11 @@ export default [
     component: require('components/ControlPanel')
   },
   {
+    path: '/events',
+    name: 'event-selector',
+    component: require('components/EventSelector')
+  },
+  {
     path: '/portal',
     name: 'sign-in',
     component: require('components/SignIn')

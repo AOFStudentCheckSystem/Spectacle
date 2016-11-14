@@ -10,7 +10,7 @@ export class StudentAPI {
    */
   all () {
     return new Promise((resolve, reject) => {
-      Vue.http.get('/student/all').then((response) => {
+      Vue.http.get('student/all').then((response) => {
         response.json().then((json) => {
           resolve(json.students)
         }, (failed) => {
@@ -24,7 +24,7 @@ export class StudentAPI {
 
   getImage (id) {
     return new Promise((resolve, reject) => {
-      Vue.http.get('/student/' + id + '/image').then((response) => {
+      Vue.http.get('student/' + id + '/image').then((response) => {
         response.blob().then((blob) => {
           resolve(blob)
         }, (failed) => {
@@ -38,7 +38,7 @@ export class StudentAPI {
 
   updateStudent (id, rfid) {
     return new Promise((resolve, reject) => {
-      Vue.http.post('/student/' + id + '/update', {
+      Vue.http.post('student/' + id + '/update', {
         params: {
           rfid: rfid
         }

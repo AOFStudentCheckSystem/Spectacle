@@ -6,7 +6,7 @@ import Vue from 'vue'
 export class EventAPI {
   all () {
     return new Promise((resolve, reject) => {
-      Vue.http.get('/event/list').then((response) => {
+      Vue.http.get('event/list').then((response) => {
         response.json().then((fulfilled) => {
           resolve(fulfilled.events)
         }, (failed) => {
@@ -20,7 +20,7 @@ export class EventAPI {
 
   getDetail (id) {
     return new Promise((resolve, reject) => {
-      Vue.http.get('/event/' + id + '/detail').then((response) => {
+      Vue.http.get('event/' + id + '/detail').then((response) => {
         response.json().then((fulfilled) => {
           resolve(fulfilled.students)
         }, (failed) => {
@@ -34,7 +34,7 @@ export class EventAPI {
 
   addEvent (name) {
     return new Promise((resolve, reject) => {
-      Vue.http.get('/event/add').then((response) => {
+      Vue.http.get('event/add').then((response) => {
         response.json().then((fulfilled) => {
           resolve(fulfilled.eventId)
         }, (failed) => {
@@ -48,7 +48,7 @@ export class EventAPI {
 
   deleteEvent (id) {
     return new Promise((resolve, reject) => {
-      Vue.http.post('/event/' + id + '/delete').then((response) => {
+      Vue.http.post('event/' + id + '/delete').then((response) => {
         if (response.ok) {
           resolve()
         } else {
@@ -62,7 +62,7 @@ export class EventAPI {
 
   addStudent (eventId, eventRecord) {
     return new Promise((resolve, reject) => {
-      Vue.http.post('/event/' + eventId + '/add', {
+      Vue.http.post('event/' + eventId + '/add', {
         params: {
           add: [{
             id: eventRecord.id,
@@ -84,11 +84,25 @@ export class EventAPI {
 
   removeStudent (eventId, id) {
     return new Promise((resolve, reject) => {
-      Vue.http.post('/event/' + eventId + '/remove', {
+      Vue.http.post('event/' + eventId + '/remove', {
         params: {
           remove: [id]
         }
       }).then((response) => {
+        if (response.ok) {
+          resolve()
+        } else {
+          reject(response)
+        }
+      }, (response) => {
+        reject(response)
+      })
+    })
+  }
+
+  complete (eventId) {
+    return new Promise((resolve, reject) => {
+      Vue.http.post('event/' + eventId + '/complete').then((response) => {
         if (response.ok) {
           resolve()
         } else {

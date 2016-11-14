@@ -3,11 +3,7 @@
 */
 <style scoped>
   .login-root {
-    -webkit-user-select: none;
     max-width: 320px;
-  }
-  .error {
-    color: #c24c54;
   }
 </style>
 
@@ -26,12 +22,9 @@
           <input type="password" v-model="password" class="form-control"
                  placeholder="password" required>
           <br>
-          <button type="submit" class="btn btn-block btn-primary">
+          <button type="submit" class="btn btn-block btn-primary" v-bind:class="{ 'btn-danger': error }">
             Sign In
           </button>
-          <div v-if="error">
-            <small class="form-text text-muted error">It's seven! It's always seven.</small>
-          </div>
         </form>
       </div>
     </div>
@@ -43,14 +36,13 @@
     data () {
       return {
         username: '',
-        password: '',
-        error: false
+        password: ''
       }
     },
     methods: {
       handleSubmit (event) {
         let self = this
-        this.$store.dispatch('setError', { error: false })
+        this.$store.dispatch('setError', {error: false})
         this.$store.dispatch('authenticate', {
           username: this.username,
           password: this.password,

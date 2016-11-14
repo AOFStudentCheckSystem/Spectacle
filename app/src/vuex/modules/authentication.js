@@ -4,6 +4,8 @@
 import Vue from 'vue'
 import * as types from '../mutation-types'
 import api from '../../api/SpectacleAPI'
+import {Notification} from '../../models/Notification'
+import {NotificationLevel} from '../../models/NotificationLevel'
 
 const state = {
   token: '',
@@ -25,12 +27,14 @@ const mutations = {
 }
 
 const actions = {
-  authenticate: ({commit}, { username, password, callback }) => {
+  authenticate: ({commit, dispatch}, { username, password, callback }) => {
     api.auth.authenticate(username, password).then((token) => {
+      dispatch('pushNotification', { notification: new Notification('Welcome, ' + username, '', NotificationLevel.SUCCESS) })
       Vue.http.headers.common['Authorization'] = 'Bearer ' + token
       commit(types.AUTHENTICATION, { token: token })
       callback()
     }, (response) => {
+      dispatch('pushNotification', { notification: new Notification('Incorrect username or password', '', NotificationLevel.DANGER) })
       commit(types.AUTHENTICATION_ERROR, { error: true })
       commit(types.AUTHENTICATION_FAILURE)
     })
