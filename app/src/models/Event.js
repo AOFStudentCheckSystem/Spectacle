@@ -21,6 +21,8 @@ export class Event {
     this.id = id
     this.name = name
     this.time = time
-    this.records = undefined
+    this.records = {}
   }
 }
+
+export const blankEvent = new Event('', '', 0, -1)

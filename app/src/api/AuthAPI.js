@@ -12,7 +12,7 @@ export class AuthAPI {
    * @returns {Promise} resolve -> token, reject -> response
    */
   authenticate (username, password) {
-    var formData = new FormData()
+    const formData = new FormData()
     formData.append('username', username)
     formData.append('password', md5(password))
     return new Promise((resolve, reject) => {

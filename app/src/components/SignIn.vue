@@ -61,13 +61,6 @@
       error () {
         return this.$store.state.authentication.error
       }
-    },
-    watch: {
-      notAuthenticated (to, from) {
-        if (!to) {
-          this.$router.replace('/')
-        }
-      }
     }
   }
 </script>

@@ -23,13 +23,15 @@ const mutations = {
 }
 
 const actions = {
-  setAtr: ({commit}, payload) => {
-    commit(types.SET_CARD_ATR, payload)
-    if (payload.atr === '') {
+  setAtr: ({dispatch, state, commit, rootState}, { atr }) => {
+    if (atr === '') {
       commit(types.SET_CARD_STATUS, { status: false })
-    } else {
+    } else if (atr !== state.atr) {
+      const students = rootState.students.students
+      dispatch('addStudent', { id: Object.keys(students).map((key) => students[key]).find((s) => s.rfid.toLowerCase() === atr.toLowerCase()).id })
       commit(types.SET_CARD_STATUS, { status: true })
     }
+    commit(types.SET_CARD_ATR, { atr })
   },
   setReaderStatus: ({dispatch, commit}, payload) => {
     dispatch('setAtr', { atr: '' })

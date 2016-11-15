@@ -3,17 +3,19 @@
  */
 import * as types from '../mutation-types'
 import api from '../../api/SpectacleAPI'
+import Vue from 'vue'
 import {EventRecord} from '../../models/EventRecord'
-import {Event} from '../../models/Event'
+import {Event, blankEvent} from '../../models/Event'
 import {EventStatus} from '../../models/EventStatus'
+import {blankStudent} from '../../models/Student'
 
 const state = {
   offlineEvents: {},
   events: {},
   eventsAvailable: false,
-  currentEvent: null,
+  currentEvent: blankEvent,
   currentEventAvailable: false,
-  currentStudent: null
+  currentStudent: blankStudent
 }
 
 const mutations = {
@@ -25,37 +27,46 @@ const mutations = {
     state.eventsAvailable = false
   },
   [types.ADD_EVENT] (state, {event}) {
-    state.events[event.id] = event
+    Vue.set(state.events, event.id, event)
   },
   [types.ADD_EVENT_FAILURE] (state) {
   },
   [types.REMOVE_EVENT] (state, {id}) {
-    delete state.events[id]
+    Vue.delete(state.events, id)
   },
   [types.REMOVE_EVENT_FAILURE] (state) {
   },
   [types.SET_CURRENT_EVENT] (state, {event}) {
-    state.currentEvent = event
+    if (event === null) {
+      state.currentEvent = blankEvent
+    } else {
+      state.currentEvent = event
+    }
   },
   [types.SET_CURRENT_EVENT_FAILURE] (state) {
   },
   [types.ADD_STUDENT_TO_EVENT] (state, {record}) {
-    state.currentEvent.records[record.id] = record
+    Vue.set(state.currentEvent.records, record.id, record)
   },
   [types.ADD_STUDENT_TO_EVENT_FAILURE] (state) {
   },
   [types.REMOVE_STUDENT_FROM_EVENT] (state, {id}) {
-    delete state.currentEvent.records[id]
+    Vue.delete(state.currentEvent.records, id)
   },
   [types.REMOVE_STUDENT_FROM_EVENT_FAILURE] (state) {
   },
   [types.SET_CURRENT_STUDENT] (state, {student}) {
-    state.currentStudent = student
+    if (student === null) {
+      state.currentStudent = blankStudent
+    } else {
+      state.currentStudent = student
+    }
   },
   [types.COMPLETE_EVENT] (state, {id}) {
     state.events[id].status = EventStatus.COMPLETE
   },
-  [types.COMPLETE_EVENT_FAILURE] (state) {}
+  [types.COMPLETE_EVENT_FAILURE] (state) {
+  }
 }
 
 const actions = {
@@ -75,7 +86,7 @@ const actions = {
   },
   addEvent: ({commit}, {name}) => {
     api.event.addEvent(name).then((response) => {
-      commit(types.ADD_EVENT, new Event(name, response, new Date().getTime().toString(), 0))
+      commit(types.ADD_EVENT, new Event(name, response, Math.trunc(new Date().getTime() / 1000).toString(), 0))
     }, (response) => {
       commit(types.ADD_EVENT_FAILURE)
     })
@@ -88,7 +99,7 @@ const actions = {
     })
   },
   setCurrentEvent: ({state, commit}, {id}) => {
-    if (state.currentEvent != null) {
+    if (id !== null) {
       api.event.getDetail(id).then((students) => {
         let records = {}
         students.forEach((responseRecord) => {
@@ -103,14 +114,35 @@ const actions = {
         commit(types.SET_CURRENT_EVENT_FAILURE)
       })
     } else {
-      commit(types.SET_CURRENT_EVENT_FAILURE)
+      commit(types.SET_CURRENT_EVENT, {event: null})
     }
   },
-  addStudent: ({state, commit}, {id}) => {
-    if (state.currentEvent != null) {
-      const record = new EventRecord(id, new Date().getTime().toString(), '-1')
+  setCurrentStudent: ({commit}, {student}) => {
+    if (student !== null) {
+      if (student.image === null) {
+        api.student.getImage(student.id).then((response) => {
+          commit(types.SET_STUDENT_IMAGE, {id: student.id, image: response})
+          commit(types.SET_CURRENT_STUDENT, {student})
+        }, (response) => {
+          commit(types.SET_STUDENT_IMAGE_FAILURE)
+          commit(types.SET_CURRENT_STUDENT, {student})
+        })
+      } else {
+        commit(types.SET_CURRENT_STUDENT, {student})
+      }
+    } else {
+      commit(types.SET_CURRENT_STUDENT, { student: null })
+    }
+  },
+  addStudent: ({dispatch, state, commit, rootState}, {id}) => {
+    if (state.currentEvent != null && state.currentEvent.records[id] === undefined) {
+      const record = new EventRecord(id, Math.trunc(new Date().getTime() / 1000).toString(), '-1')
       api.event.addStudent(state.currentEvent.id, record).then((response) => {
         commit(types.ADD_STUDENT_TO_EVENT, {record})
+        dispatch('setCurrentStudent', { student: rootState.students.students[id] })
+        window.setTimeout(() => {
+          dispatch('setCurrentStudent', { student: null })
+        }, 3000)
       }, (response) => {
         commit(types.ADD_STUDENT_TO_EVENT_FAILURE)
       })
@@ -129,7 +161,7 @@ const actions = {
       commit(types.REMOVE_STUDENT_FROM_EVENT_FAILURE)
     }
   },
-  completeEvent: ({commit}, { id }) => {
+  completeEvent: ({commit}, {id}) => {
     api.event.complete(id).then((response) => {
       commit(types.COMPLETE_EVENT, {id})
     }, (response) => {

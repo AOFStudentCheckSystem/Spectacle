@@ -14,9 +14,15 @@ export class Student {
       this.dorm = 'Day'
     }
     this.grade = remoteJsonObject.grade
+    this.image = null
   }
 
   getDisplayName () {
-    return this.lastName + ', ' + this.firstName + this.preferredName === this.firstName ? '' : ' (' + this.preferredName + ')'
+    return this.lastName + ', ' + this.firstName + (this.preferredName === this.firstName ? '' : ' (' + this.preferredName + ')')
   }
 }
+
+export const blankStudent = new Student({
+  firstName: 'First Name',
+  lastName: 'Last Name'
+})

@@ -7,7 +7,11 @@
   }
 
   *:focus {
-    outline:none !important;
+    outline: none !important;
+  }
+
+  *::-webkit-scrollbar {
+    display: none;
   }
 
   html,
@@ -24,7 +28,6 @@
             rgba(255, 255, 255, 1) 0%,
             rgba(229, 229, 229, .85) 100%
     ), center;
-    /*background-position: center;*/
     display: flex;
     font-family: Lato, Helvetica, sans-serif;
     justify-content: center;
@@ -68,24 +71,6 @@
     transition: all .4s ease; /* cubic-bezier(.55, 0, .1, 1) */
   }
 
-  /*@media screen and (max-width: 300px){*/
-    /*.main-view {*/
-      /*margin-top: 100px;*/
-    /*}*/
-  /*}*/
-
-  /*@media screen and (max-width: 768px) and (min-width: 300px){*/
-    /*.main-view {*/
-      /*margin-top: 100px;*/
-    /*}*/
-  /*}*/
-
-  /*@media screen and (min-width: 768px){*/
-    /*.main-view {*/
-      /*margin-top: 100px;*/
-    /*}*/
-  /*}*/
-
   .main-view {
     padding-top: 100px;
   }
@@ -116,11 +101,9 @@
 </template>
 
 <script>
-  import store from './vuex/store'
   import GlobalNotifications from './components/GlobalNotifications'
 
   export default {
-    store,
     components: {
       GlobalNotifications
     },
@@ -132,8 +115,8 @@
     },
     methods: {
       signOut () {
-        if (store.state.authentication.authenticated) {
-          store.dispatch('signOut')
+        if (this.$store.state.authentication.authenticated) {
+          this.$store.dispatch('signOut')
           this.$router.replace('/portal')
         }
       },
@@ -143,11 +126,16 @@
     },
     computed: {
       signInStatus () {
-        return store.state.authentication.authenticated ? 'Sign Out' : 'No User'
+        return this.authenticated ? 'Sign Out' : 'No User'
+      },
+      authenticated () {
+        return this.$store.state.authentication.authenticated
       }
     },
     created () {
-      this.$router.replace('/portal')
+      if (!this.authenticated) {
+        this.$router.replace('/portal')
+      }
       let self = this
       this.$router.beforeEach((to, from, next) => {
         const toDepth = to.path.split('/').length

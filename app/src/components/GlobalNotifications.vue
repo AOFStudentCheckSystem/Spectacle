@@ -12,6 +12,7 @@
   }
 
   .notification-list-item {
+    text-align: left;
     transition: all 0.5s;
   }
 
@@ -27,12 +28,15 @@
 </style>
 
 <template>
-  <div class="notification-list">
-    <transition-group name="notification-list">
-      <div class="alert notification-list-item" v-for="n in notifications" role="alert" v-bind:class="n.level.styles" v-bind:key="n">
-        <strong>{{n.title}}</strong> {{n.text}}
-      </div>
-    </transition-group>
+  <div class="container">
+    <div class="notification-list col-sm-4">
+      <transition-group name="notification-list">
+        <div class="alert notification-list-item" v-for="n in notifications" role="alert" v-bind:class="n.level.styles"
+             v-bind:key="n">
+          <strong>{{n.title}}</strong> {{n.text}}
+        </div>
+      </transition-group>
+    </div>
   </div>
 </template>
 

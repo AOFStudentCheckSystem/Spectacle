@@ -3,9 +3,10 @@
  */
 import api from '../../api/SpectacleAPI'
 import * as types from '../mutation-types'
+import {Student} from '../../models/Student'
 
 const state = {
-  students: [],
+  students: {},
   studentsAvailable: false
 }
 
@@ -30,7 +31,11 @@ const mutations = {
 const actions = {
   refreshStudents: ({commit}) => {
     api.student.all().then((response) => {
-      commit(types.SET_STUDENTS, { students: response })
+      let mappedStudents = {}
+      response.forEach((student) => {
+        mappedStudents[student.studentId] = new Student(student)
+      })
+      commit(types.SET_STUDENTS, { students: mappedStudents })
     }, (response) => {
       commit(types.SET_STUDENTS_FAILURE)
     })

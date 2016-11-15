@@ -61,16 +61,16 @@ export class EventAPI {
   }
 
   addStudent (eventId, eventRecord) {
+    const add = new FormData()
+    add.append('data', JSON.stringify({
+      add: [{
+        id: eventRecord.id,
+        checkin: eventRecord.inTime,
+        checkout: eventRecord.outTime
+      }]
+    }))
     return new Promise((resolve, reject) => {
-      Vue.http.post('event/' + eventId + '/add', {
-        params: {
-          add: [{
-            id: eventRecord.id,
-            checkin: eventRecord.inTime,
-            checkout: eventRecord.outTime
-          }]
-        }
-      }).then((response) => {
+      Vue.http.post('event/' + eventId + '/add', add).then((response) => {
         if (response.ok) {
           resolve()
         } else {
@@ -83,12 +83,12 @@ export class EventAPI {
   }
 
   removeStudent (eventId, id) {
+    const remove = new FormData()
+    remove.append('data', JSON.stringify({
+      remove: [id]
+    }))
     return new Promise((resolve, reject) => {
-      Vue.http.post('event/' + eventId + '/remove', {
-        params: {
-          remove: [id]
-        }
-      }).then((response) => {
+      Vue.http.post('event/' + eventId + '/remove', remove).then((response) => {
         if (response.ok) {
           resolve()
         } else {

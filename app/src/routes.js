@@ -10,6 +10,11 @@ export default [
     component: require('components/EventSelector')
   },
   {
+    path: '/events/check',
+    name: 'event-check',
+    component: require('components/EventPanel')
+  },
+  {
     path: '/portal',
     name: 'sign-in',
     component: require('components/SignIn')

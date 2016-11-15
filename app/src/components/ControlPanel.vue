@@ -84,16 +84,16 @@
       <div class="col-xs-6 col-sm-4">
         <a href="#" class="thumbnail">
           <div class="control-square">
-            <i class="fa fa-ban fa-icon" aria-label="hidden"></i>
-            <p class="control-size">Lorem Ipsum</p>
+            <i class="fa fa-chain-broken fa-icon" aria-label="hidden"></i>
+            <p class="control-size">Offline</p>
           </div>
         </a>
       </div>
       <div class="col-xs-6 col-sm-4">
         <a href="#" class="thumbnail">
           <div class="control-square">
-            <i class="fa fa-ban fa-icon" aria-label="hidden"></i>
-            <p class="control-size">Lorem Ipsum</p>
+            <i class="fa fa-sliders fa-icon" aria-label="hidden"></i>
+            <p class="control-size">Preferences</p>
           </div>
         </a>
       </div>
@@ -105,63 +105,15 @@
           </div>
         </a>
       </div>
-      <!--<div class="col-xs-5 col-sm-6 col-md-4">-->
-        <!--<a href="#/event">-->
-          <!--<div class="panel panel-default">-->
-            <!--<div class="panel-body text-center">-->
-              <!--<i class="fa fa-bus fa-icon" aria-label="hidden"></i>-->
-              <!--<h1>Start Check-in</h1>-->
-            <!--</div>-->
-          <!--</div>-->
-        <!--</a>-->
-      <!--</div>-->
-      <!--<div class="col-xs-5 col-sm-6 col-md-4">-->
-        <!--<div class="panel panel-default">-->
-          <!--<div class="panel-body text-center">-->
-            <!--<i class="fa fa-sign-out fa-icon"></i>-->
-            <!--<h1>2</h1>-->
-          <!--</div>-->
-        <!--</div>-->
-      <!--</div>-->
-      <!--<div class="col-xs-5 col-sm-6 col-md-4">-->
-        <!--<div class="panel panel-default">-->
-          <!--<div class="panel-body text-center">-->
-            <!--<i class="fa fa-id-card fa-icon"></i>-->
-            <!--<h1>3</h1>-->
-          <!--</div>-->
-        <!--</div>-->
-      <!--</div>-->
-      <!--<div class="col-xs-5 col-sm-6 col-md-4">-->
-        <!--<div class="panel panel-default">-->
-          <!--<div class="panel-body text-center">-->
-            <!--<i class="fa fa-refresh fa-icon"></i>-->
-            <!--<h1>4</h1>-->
-          <!--</div>-->
-        <!--</div>-->
-      <!--</div>-->
-      <!--<div class="col-xs-5 col-sm-6 col-md-4">-->
-        <!--<div class="panel panel-default">-->
-          <!--<div class="panel-body text-center">-->
-            <!--<i class="fa fa-ambulance fa-icon"></i>-->
-            <!--<h1>Restart</h1>-->
-          <!--</div>-->
-        <!--</div>-->
-      <!--</div>-->
-      <!--<div class="col-xs-5 col-sm-6 col-md-4">-->
-        <!--<a href="#/advanced">-->
-          <!--<div class="panel panel-default">-->
-            <!--<div class="panel-body text-center">-->
-              <!--<i class="fa fa-code fa-icon"></i>-->
-              <!--<h1>Advanced</h1>-->
-            <!--</div>-->
-          <!--</div>-->
-        <!--</a>-->
-      <!--</div>-->
     </div>
   </div>
 </template>
 
 <script>
-  export default {}
+  export default {
+    created () {
+      this.$store.dispatch('refreshStudents')
+    }
+  }
 </script>
 

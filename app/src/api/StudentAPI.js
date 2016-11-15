@@ -26,7 +26,12 @@ export class StudentAPI {
     return new Promise((resolve, reject) => {
       Vue.http.get('student/' + id + '/image').then((response) => {
         response.blob().then((blob) => {
-          resolve(blob)
+          const reader = new window.FileReader()
+          reader.readAsDataURL(blob)
+          reader.onloadend = function () {
+            let base64data = reader.result
+            resolve(base64data)
+          }
         }, (failed) => {
           reject(failed)
         })
@@ -37,12 +42,10 @@ export class StudentAPI {
   }
 
   updateStudent (id, rfid) {
+    const update = new FormData()
+    update.append('rfid', rfid)
     return new Promise((resolve, reject) => {
-      Vue.http.post('student/' + id + '/update', {
-        params: {
-          rfid: rfid
-        }
-      }).then((response) => {
+      Vue.http.post('student/' + id + '/update', update).then((response) => {
         if (response.ok) {
           resolve()
         } else {
