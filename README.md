@@ -8,23 +8,26 @@
 # install yarn
 npm install -g yarn
 
+# clean all cache !important
+yarn cache chean
+
 # install dependencies
 yarn install
 
-# rebuild natives
+# rebuild natives !important
 yarn rebuild
 
 # serve with hot reload at localhost:9080
-yarn dev
+yarn run dev
 
 # build electron app for production
-yarn build
+yarn run build
 
 # lint all JS/Vue component files in `app/src`
-yarn lint
+yarn run lint
 
 # run webpack in production
-yarn pack
+yarn run pack
 ```
 More information can be found [here](https://simulatedgreg.gitbooks.io/electron-vue/content/docs/npm_scripts.html).
 

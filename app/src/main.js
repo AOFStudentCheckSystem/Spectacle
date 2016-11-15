@@ -4,7 +4,8 @@ import Resource from 'vue-resource'
 import Router from 'vue-router'
 import Vuex from 'vuex'
 import devices from './smartcard'
-import notifier from './notifier'
+import {NotificationLevel} from './models/NotificationLevel'
+import {Notification} from './models/Notification'
 
 import App from './App'
 import routes from './routes'
@@ -20,6 +21,21 @@ Vue.use(Resource)
 Vue.config.debug = true
 
 Vue.use(Vuex)
+
+export const notifier = {
+  info (title, text) {
+    store.dispatch('pushNotification', { notification: new Notification(title, text, NotificationLevel.INFO) })
+  },
+  success (title, text) {
+    store.dispatch('pushNotification', { notification: new Notification(title, text, NotificationLevel.SUCCESS) })
+  },
+  warning (title, text) {
+    store.dispatch('pushNotification', { notification: new Notification(title, text, NotificationLevel.WARNING) })
+  },
+  danger (title, text) {
+    store.dispatch('pushNotification', { notification: new Notification(title, text, NotificationLevel.DANGER) })
+  }
+}
 
 export const store = new Vuex.Store(storeParams)
 
