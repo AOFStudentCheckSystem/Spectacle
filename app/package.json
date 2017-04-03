@@ -1,0 +1,15 @@
+{
+  "name": "spectacle",
+  "version": "0.0.0",
+  "description": "a spectacular event viewer",
+  "main": "./dist/main.js",
+  "dependencies": {
+    "vue": "^2.1.10",
+    "vue-electron": "^1.0.6",
+    "vue-resource": "^1.0.3",
+    "vue-router": "^2.1.2",
+    "vuex": "^2.1.1"
+  },
+  "devDependencies": {},
+  "author": "dummy <m.steve.jobs@me.com>"
+}
