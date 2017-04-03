@@ -5,10 +5,10 @@
 </template>
 
 <script>
-  import store from 'renderer/vuex/store'
-  export default {
-    store
-  }
+    import store from 'renderer/vuex/store'
+    export default {
+        store
+    }
 </script>
 
 <style>
@@ -20,16 +20,17 @@
   }
 
   html,
-  body { height: 100%; }
+  body {
+    height: 100%;
+  }
 
   body {
     align-items: center;
-    background:
-      radial-gradient(
-        ellipse at center,
-        rgba(255, 255, 255, 1) 0%,
-        rgba(229, 229, 229, .85) 100%
-      );
+    background: radial-gradient(
+            ellipse at center,
+            rgba(255, 255, 255, 1) 0%,
+            rgba(229, 229, 229, .85) 100%
+    );
     background-position: center;
     display: flex;
     font-family: Lato, Helvetica, sans-serif;

@@ -2,6 +2,7 @@
   <div>
     <img src="./LandingPageView/assets/logo.png" alt="electron-vue">
     <h1>Welcome.</h1>
+    <h2>{{reader}}</h2>
     <current-page></current-page>
     <versions></versions>
     <links></links>
@@ -9,17 +10,39 @@
 </template>
 
 <script>
-  import CurrentPage from './LandingPageView/CurrentPage'
-  import Links from './LandingPageView/Links'
-  import Versions from './LandingPageView/Versions'
-  export default {
-    components: {
-      CurrentPage,
-      Links,
-      Versions
-    },
-    name: 'landing-page'
-  }
+    import CurrentPage from './LandingPageView/CurrentPage'
+    import Links from './LandingPageView/Links'
+    import Versions from './LandingPageView/Versions'
+    import { SmartCardController } from 'smartcard'
+
+    export default {
+        components: {
+            CurrentPage,
+            Links,
+            Versions
+        },
+        name: 'landing-page',
+        data () {
+            return {
+                smartcard: new SmartCardController(),
+                reader: ''
+            }
+        },
+        created () {
+            const self = this
+            this.smartcard.onConnect(reader => {
+                reader.onInsert(data => {
+                    self.reader = data
+                })
+                reader.onRemove(() => {
+                    self.reader = ''
+                })
+            })
+        },
+        beforeDestroy () {
+            this.smartcard.close()
+        }
+    }
 </script>
 
 <style scoped>

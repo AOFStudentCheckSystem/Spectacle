@@ -8,8 +8,8 @@ import modules from './modules'
 Vue.use(Vuex)
 
 export default new Vuex.Store({
-  actions,
-  getters,
-  modules,
-  strict: process.env.NODE_ENV !== 'production'
+    actions,
+    getters,
+    modules,
+    strict: process.env.NODE_ENV !== 'production'
 })

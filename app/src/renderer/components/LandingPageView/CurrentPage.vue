@@ -5,17 +5,17 @@
 </template>
 
 <script>
-  export default {
-    created () {
-      // Set $route values that are not preset during unit testing
-      if (process.env.NODE_ENV === 'testing') {
-        this.$route = {
-          name: 'landing-page',
-          path: '/landing-page'
+    export default {
+        created () {
+            // Set $route values that are not preset during unit testing
+            if (process.env.NODE_ENV === 'testing') {
+                this.$route = {
+                    name: 'landing-page',
+                    path: '/landing-page'
+                }
+            }
         }
-      }
     }
-  }
 </script>
 
 <style scoped>
@@ -29,5 +29,7 @@
     vertical-align: bottom;
   }
 
-  p { line-height: 24px; }
+  p {
+    line-height: 24px;
+  }
 </style>
