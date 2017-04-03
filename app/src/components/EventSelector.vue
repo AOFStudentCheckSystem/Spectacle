@@ -27,6 +27,10 @@
   .container {
     max-width: 90vw;
   }
+
+  .no-active {
+    padding-bottom: 10vh;
+  }
 </style>
 
 <template>

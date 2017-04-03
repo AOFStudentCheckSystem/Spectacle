@@ -89,7 +89,6 @@
         </div>
         <ul class="nav navbar-nav navbar-right collapse navbar-collapse" v-on:click="signOut()">
           <li><a class="navbar-brand">{{ signInStatus }}</a></li>
-          <!--<li><a class="navbar-brand">7</a></li>-->
         </ul>
       </div>
     </nav>
@@ -126,7 +125,7 @@
     },
     computed: {
       signInStatus () {
-        return this.authenticated ? 'Sign Out' : 'No User'
+        return this.authenticated ? 'Sign Out' : ''
       },
       authenticated () {
         return this.$store.state.authentication.authenticated

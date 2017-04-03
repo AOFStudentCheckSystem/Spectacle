@@ -42,7 +42,7 @@ let config = {
       },
       {
         test: /\.node$/,
-        loader: 'node-loader'
+        loader: 'node-loader?name=natives/[hash:7].[ext]'
       },
       {
         test: /\.md$/,

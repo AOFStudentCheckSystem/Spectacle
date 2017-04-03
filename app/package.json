@@ -2,13 +2,23 @@
   "name": "spectacle",
   "version": "0.0.0",
   "description": "The awesome swiss army knife for checking in students.",
+  "scripts": {
+    "rebuild": "yarn rebuild:buffertools && yarn rebuild:pcsclite && yarn compile:smartcard",
+    "rebuild:pcsclite": "( cd node_modules/pcsclite && node-gyp rebuild --runtime=electron --target=1.4.6 --disturl=https://atom.io/download/atom-shell --abi=50 )",
+    "rebuild:buffertools": "( cd node_modules/buffertools && node-gyp rebuild --runtime=electron --target=1.4.6 --disturl=https://atom.io/download/atom-shell --abi=50 )",
+    "compile:smartcard": "( cd node_modules/smartcard && yarn compile )"
+  },
   "main": "electron.js",
   "dependencies": {
     "vue": "^2.0.1",
     "vue-electron": "^1.0.0",
     "vue-resource": "^1.0.3",
     "vue-router": "^2.0.0",
-    "vuex": "^2.0.0"
+    "vuex": "^2.0.0",
+    "smartcard": "https://github.com/AOFStudentCheckSystem/smartcard.git",
+    "jquery": "^3.1.1",
+    "font-awesome": "^4.7.0",
+    "bootstrap": "^3.3.7"
   },
   "devDependencies": {},
   "author": "dummy <m.steve.jobs@me.com>"

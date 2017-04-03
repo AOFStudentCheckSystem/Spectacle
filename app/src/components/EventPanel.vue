@@ -46,6 +46,11 @@
           <input type="text" class="form-control" placeholder="Search" v-model="searchText"/>
         </div>
         <div class="list-group">
+          <!--<a class="list-group-item">-->
+            <!--<div class="list-group-item-heading">-->
+              <!--<input type="text" class="form-control" placeholder="Search" v-model="searchText"/>-->
+            <!--</div>-->
+          <!--</a>-->
           <a class="list-group-item" v-for="s in filteredStudents">
             <div class="list-group-item-heading">
               {{s.student.getDisplayName()}}

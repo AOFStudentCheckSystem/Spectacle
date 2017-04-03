@@ -11,16 +11,16 @@ import App from './App'
 import routes from './routes'
 import storeParams from './vuex/store'
 
-import '../../node_modules/bootstrap/dist/css/bootstrap.css'
-import '../../node_modules/bootstrap/dist/js/bootstrap'
-import '../../node_modules/font-awesome/css/font-awesome.css'
+import 'bootstrap/dist/css/bootstrap.css'
+import 'bootstrap/dist/js/bootstrap'
+import 'font-awesome/css/font-awesome.css'
 
 Vue.use(Electron)
 Vue.use(Router)
 Vue.use(Resource)
-Vue.config.debug = true
-
 Vue.use(Vuex)
+
+Vue.config.debug = true
 
 export const notifier = {
   info (title, text) {
@@ -65,7 +65,7 @@ const mixin = {
   }
 }
 
-Vue.http.options.root = 'http://hn2.guardiantech.com.cn:57463/api'
+Vue.http.options.root = 'http://hn2.guardiantech.com.cn:10492/v2/api'
 delete Vue.http.headers['post']
 delete Vue.http.headers['get']
 
