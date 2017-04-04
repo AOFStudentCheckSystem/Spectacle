@@ -16,6 +16,8 @@ const router = new Router({
     routes
 })
 
+Vue.http.options.root = 'http://hn2.guardiantech.com.cn:10492/v2/api'
+
 /* eslint-disable no-new */
 new Vue({
     router,
