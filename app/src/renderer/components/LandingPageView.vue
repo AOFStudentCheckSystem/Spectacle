@@ -14,7 +14,7 @@
     import Links from './LandingPageView/Links'
     import Versions from './LandingPageView/Versions'
     import { SmartCardController } from 'smartcard'
-    import { AuthAPI } from '../api/auth'
+//    import { AuthAPI } from '../api/auth'
 
     export default {
         components: {
@@ -35,11 +35,11 @@
                 reader.onInsert(data => {
                     self.reader = data
                 })
-                reader.onRemove(() => {
+                reader.onEmpty(() => {
                     self.reader = ''
                 })
             })
-            console.log(await AuthAPI.login('someuser', 'somepassword'))
+//            console.log(await AuthAPI.login('someuser', 'somepassword'))
         },
         beforeDestroy () {
             this.smartcard.close()

@@ -1,6 +1,7 @@
 /**
  * Created by dummy on 4/3/17.
  */
+import * as hexify from 'hexify'
 export class SmartCardController {
     constructor () {
         this.__internal = new SmartCardInternal()
@@ -32,7 +33,11 @@ export class SmartCardController {
     }
 
     removeConnectCallback (id) {
+        this.__internal.removeConnectCallback(id)
+    }
 
+    removeErrorCallback (id) {
+        this.__internal.removeErrorCallback(id)
     }
 }
 
@@ -75,6 +80,14 @@ class SmartCardInternal {
     close () {
         this.pcsc.close()
     }
+
+    removeConnectCallback (id) {
+        delete this.connectCallbacks[id]
+    }
+
+    removeErrorCallback (id) {
+        delete this.errorCallbacks[id]
+    }
 }
 
 export class Reader {
@@ -97,8 +110,8 @@ export class Reader {
      * @param callback
      * @returns remove callback id
      */
-    onRemove (callback) {
-        return this.__internal.addRemoveCallback(callback)
+    onEmpty (callback) {
+        return this.__internal.addEmptyCallback(callback)
     }
 
     /**
@@ -131,7 +144,7 @@ class ReaderInternal {
     constructor (pcscliteReader) {
         this.callbackId = 0
         this.insertCallbacks = {}
-        this.removeCallbacks = {}
+        this.emptyCallbacks = {}
         this.errorCallbacks = {}
         this.endCallbacks = {}
 
@@ -147,35 +160,28 @@ class ReaderInternal {
             const changes = this.state ^ status.state
             if (changes) {
                 if ((changes & this.SCARD_STATE_EMPTY) && (status.state & this.SCARD_STATE_EMPTY)) {
-                    console.debug('card removed')
+                    console.debug('card empty')
                     /* card removed */
                     pcscliteReader.disconnect(pcscliteReader.SCARD_LEAVE_CARD, function (err) {
                         if (err) {
                             console.debug(err)
                             Object.values(self.errorCallbacks).forEach((e) => e(err))
                         } else {
-                            console.debug('Disconnected')
-                            Object.values(self.removeCallbacks).forEach((e) => e())
+                            console.debug('emptied')
+                            Object.values(self.emptyCallbacks).forEach((e) => e())
                         }
                     })
                 } else if ((changes & this.SCARD_STATE_PRESENT) && (status.state & this.SCARD_STATE_PRESENT)) {
-                    console.debug('card inserted')
+                    console.debug('card inserted', status)
                     /* card inserted */
                     pcscliteReader.connect({share_mode: this.SCARD_SHARE_SHARED}, function (err, protocol) {
                         if (err) {
                             console.debug(err)
                             Object.values(self.errorCallbacks).forEach((e) => e(err))
                         } else {
-                            console.debug('[INFO] Reader(', pcscliteReader.name, '): Protocol ', protocol)
-                            pcscliteReader.transmit(new Buffer([0x00, 0xB0, 0x00, 0x00, 0x20]), 40, protocol, function (err, data) {
-                                if (err) {
-                                    console.log(err)
-                                    Object.values(self.errorCallbacks).forEach((e) => e(err))
-                                } else {
-                                    console.log('Data received', data)
-                                    Object.values(self.insertCallbacks).forEach((e) => e(data))
-                                }
-                            })
+                            const card = new Card(protocol, status.atr.toString('hex'))
+                            console.debug('[INFO] Card(', card.protocol, card.atr, '): Inserted ')
+                            Object.values(self.insertCallbacks).forEach((e) => e(card))
                         }
                     })
                 }
@@ -196,8 +202,8 @@ class ReaderInternal {
         return this.callbackId
     }
 
-    addRemoveCallback (callback) {
-        this.removeCallbacks[this.callbackId++] = callback
+    addEmptyCallback (callback) {
+        this.emptyCallbacks[this.callbackId++] = callback
         return this.callbackId
     }
 
@@ -211,9 +217,44 @@ class ReaderInternal {
         return this.callbackId
     }
 
+    async transmit (card, apduCommand) {
+        let buffer
+
+        if (Array.isArray(apduCommand)) {
+            buffer = new Buffer(apduCommand)
+        } else if (typeof apduCommand === 'string') {
+            buffer = new Buffer(hexify.toByteArray(apduCommand))
+        } else if (Buffer.isBuffer(apduCommand)) {
+            buffer = apduCommand
+        } else if (typeof apduCommand === 'string') {
+            buffer = new Buffer(hexify.toByteArray(apduCommand))
+        } else {
+            buffer = apduCommand.toBuffer()
+        }
+
+        return new Promise((resolve, reject) => {
+            this.internalReader.transmit(buffer, 0xFF, card.protocol, function (err, data) {
+                if (err) {
+                    console.log(err)
+                    reject(err)
+                } else {
+                    console.log('Data received', data)
+                    resolve(data)
+                }
+            })
+        })
+    }
+
     close () {
         console.debug('[INFO] Reader(', this.internalReader.name, '):', 'removed')
         Object.values(this.endCallbacks).forEach((e) => e())
         this.internalReader.close()
+    }
+}
+
+export class Card {
+    constructor (protocol, atr) {
+        this.protocol = protocol
+        this.atr = atr
     }
 }
