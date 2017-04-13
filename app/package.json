@@ -9,10 +9,13 @@
   "main": "./dist/main.js",
   "dependencies": {
     "@pokusew/pcsclite": "^0.4.17",
+    "axios": "^0.16.1",
+    "framework7": "^1.6.0",
+    "framework7-vue": "^0.9.0",
+    "hexify": "^1.0.1",
+    "moment": "^2.18.1",
     "vue": "^2.1.10",
     "vue-electron": "^1.0.6",
-    "vue-resource": "^1.0.3",
-    "vue-router": "^2.1.2",
     "vuex": "^2.1.1"
   },
   "devDependencies": {},

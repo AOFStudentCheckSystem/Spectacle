@@ -1,11 +1,14 @@
 export default [
     {
-        path: '/',
-        name: 'landing-page',
-        component: require('components/LandingPageView')
+        path: '/about/',
+        component: require('./components/about.vue')
     },
     {
-        path: '*',
-        redirect: '/'
+        path: '/form/',
+        component: require('./components/form.vue')
+    },
+    {
+        path: '/dynamic-route/blog/:blogId/post/:postId/',
+        component: require('./components/dynamic-route.vue')
     }
 ]
