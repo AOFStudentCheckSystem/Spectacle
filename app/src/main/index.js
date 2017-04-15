@@ -13,7 +13,12 @@ function createWindow () {
      */
     mainWindow = new BrowserWindow({
         height: 600,
-        width: 800
+        width: 800,
+        webPreferences: {
+            scrollBounce: true
+        },
+        frame: false,
+        title: 'Spectacle'
     })
 
     mainWindow.loadURL(winURL)

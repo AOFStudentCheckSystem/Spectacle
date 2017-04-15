@@ -11,6 +11,7 @@
     "@pokusew/pcsclite": "^0.4.17",
     "axios": "^0.16.1",
     "framework7": "^1.6.0",
+    "framework7-icons": "^0.8.9",
     "framework7-vue": "^0.9.0",
     "hexify": "^1.0.1",
     "moment": "^2.18.1",
