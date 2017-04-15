@@ -1,4 +1,31 @@
+import DetailPage from './components/Event/DetailPage.vue'
+import EditPage from './components/Event/EditPage.vue'
+import CheckPage from './components/Event/CheckPage.vue'
+
+import EventLeftView from './components/Event/EventLeftView.vue'
+import SubjectLeftView from './components/Subject/SubjectLeftView.vue'
+
 export default [
+    {
+        path: '/event/',
+        component: DetailPage
+    },
+    {
+        path: '/event/edit/',
+        component: EditPage
+    },
+    {
+        path: '/event/check/',
+        component: CheckPage
+    },
+    {
+        path: '/left/event/',
+        component: EventLeftView
+    },
+    {
+        path: '/left/subject/',
+        component: SubjectLeftView
+    }
     // {
     //     path: '/about/',
     //     component: require('./components/about.vue')

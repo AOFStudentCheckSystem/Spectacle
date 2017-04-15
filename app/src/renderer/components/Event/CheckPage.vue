@@ -6,8 +6,9 @@
 </style>
 
 <template>
-  <f7-page>
-    <f7-navbar :title="title" back-link="/event/" sliding></f7-navbar>
+  <f7-page name="event-check">
+    <f7-navbar title="title" back-link="Back" sliding></f7-navbar>
+    nothing here
   </f7-page>
 </template>
 

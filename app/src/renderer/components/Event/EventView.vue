@@ -6,10 +6,10 @@
 </style>
 
 <template>
-  <f7-view navbar-through tab active dynamic-navbar main ref="view" class="main-view">
-    <f7-navbar :title="title" sliding></f7-navbar>
+  <f7-view navbar-through tab active :dynamic-navbar="true" main ref="view" :class="eventClassObject">
+    <f7-navbar title="titi" sliding></f7-navbar>
     <f7-pages>
-      <detail-page id="event-detail-page"></detail-page>
+      <detail-page></detail-page>
     </f7-pages>
   </f7-view>
 </template>
@@ -40,18 +40,15 @@
         methods: {
             routeTo (route, sidePanel) {
                 if (sidePanel) {
-                    this.$publish(this.$channels.LEFT_VIEW_ROUTE, {page: sidePanel})
+                    this.sidePanel = true
+                    this.$publish(this.$channels.LEFT_VIEW_ROUTE, {url: sidePanel})
                     this.$publish(this.$channels.LEFT_VIEW_ENABLE, true)
                 } else {
+                    this.sidePanel = false
                     this.$publish(this.$channels.LEFT_VIEW_ENABLE, false)
                 }
-                this.router.load({page: route})
+                this.router.load({url: route})
             }
-        },
-        mounted () {
-            this.$nextTick(() => {
-                this.routeTo('event-detail-page', 'event-left-view')
-            })
         }
     }
 </script>

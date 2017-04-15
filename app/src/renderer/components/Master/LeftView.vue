@@ -2,16 +2,23 @@
 * Created by dummy on 4/14/17.
 */
 <style scoped>
+  .disable {
+    display: none;
+  }
 </style>
 
 <template>
-  <f7-view navbar-through dynamic-navbar ref="view" :class="styleClassObject">
-    <f7-navbar title="" sliding>
+  <f7-view navbar-through ref="view" :class="styleClassObject">
+    <f7-navbar title="Events" slide>
+      <f7-nav-right>
+        <!-- Add new VL item on click -->
+        <f7-link @click="addNewItem">
+          <f7-icon f7="add"></f7-icon>
+        </f7-link>
+      </f7-nav-right>
     </f7-navbar>
     <f7-pages>
-      <f7-page id="default-left-view">
-      </f7-page>
-      <event-left-view id="event-left-view"></event-left-view>
+      <event-left-view ref="event-left-view" id="event-left-view"></event-left-view>
     </f7-pages>
   </f7-view>
 </template>
@@ -25,14 +32,19 @@
         mixins: [EventBusMixin],
         data () {
             return {
-                enabled: false
+                enabled: true
+            }
+        },
+        methods: {
+            addNewItem () {
+                this.$refs['event-left-view'].addNewItem()
             }
         },
         computed: {
             styleClassObject () {
                 return {
                     'view-left': true,
-                    'disabled': !this.enabled
+                    'disable': !this.enabled
                 }
             },
             router () {
@@ -43,9 +55,6 @@
             const self = this
             this.$subscribe(this.$channels.LEFT_VIEW_ENABLE, (enable) => {
                 self.enabled = enable
-                if (!enable) {
-                    self.router.load({ page: 'default-left-view' })
-                }
             })
             this.$subscribe(this.$channels.LEFT_VIEW_ROUTE, (data) => {
                 try {

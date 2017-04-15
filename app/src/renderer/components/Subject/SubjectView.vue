@@ -6,7 +6,7 @@
 </style>
 
 <template>
-  <f7-view tab navbar-through dynamic-navbar class="main-view">
+  <f7-view tab navbar-through :dynamic-navbar="true" class="main-view">
 
   </f7-view>
 </template>
