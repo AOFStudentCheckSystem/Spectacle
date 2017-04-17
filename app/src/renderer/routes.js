@@ -4,6 +4,7 @@ import CheckPage from './components/Event/CheckPage.vue'
 
 import EventLeftView from './components/Event/EventLeftView.vue'
 import SubjectLeftView from './components/Subject/SubjectLeftView.vue'
+import EmptyLeftView from './components/Master/EmptyLeftView.vue'
 
 export default [
     {
@@ -25,6 +26,10 @@ export default [
     {
         path: '/left/subject/',
         component: SubjectLeftView
+    },
+    {
+        path: '/left/',
+        component: EmptyLeftView
     }
     // {
     //     path: '/about/',

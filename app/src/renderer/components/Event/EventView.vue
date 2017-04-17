@@ -6,12 +6,12 @@
 </style>
 
 <template>
-  <f7-view navbar-through tab active :dynamic-navbar="true" main ref="view" :class="eventClassObject">
-    <f7-navbar title="titi" sliding></f7-navbar>
-    <f7-pages>
-      <detail-page></detail-page>
-    </f7-pages>
-  </f7-view>
+    <f7-view navbar-through tab active :dynamic-navbar="true" main ref="view" :class="eventClassObject" @tab:show="setSidePanel">
+        <f7-navbar title="titi" sliding></f7-navbar>
+        <f7-pages>
+            <detail-page></detail-page>
+        </f7-pages>
+    </f7-view>
 </template>
 
 <script>
@@ -29,7 +29,10 @@
         },
         computed: {
             router () {
-                return this.$refs['view'].f7View.router
+                if (this.$refs['view']) {
+                    return this.$refs['view'].f7View.router
+                }
+                return null
             },
             eventClassObject () {
                 return {
@@ -39,15 +42,30 @@
         },
         methods: {
             routeTo (route, sidePanel) {
-                if (sidePanel) {
+                this.routeSidePanel(sidePanel)
+                this.router.load({url: route})
+            },
+            routeSidePanel (route) {
+                if (route) {
                     this.sidePanel = true
-                    this.$publish(this.$channels.LEFT_VIEW_ROUTE, {url: sidePanel})
+                    this.$publish(this.$channels.LEFT_VIEW_ROUTE, {url: route})
                     this.$publish(this.$channels.LEFT_VIEW_ENABLE, true)
                 } else {
                     this.sidePanel = false
+                    this.$publish(this.$channels.LEFT_VIEW_ROUTE, {url: '/left/'})
                     this.$publish(this.$channels.LEFT_VIEW_ENABLE, false)
                 }
-                this.router.load({url: route})
+            },
+            setSidePanel () {
+                this.routeSidePanel('/left/event/')
+            }
+        },
+        watch: {
+            router (newVal) {
+                if (newVal) {
+                    console.log(newVal)
+                    this.setSidePanel()
+                }
             }
         }
     }
