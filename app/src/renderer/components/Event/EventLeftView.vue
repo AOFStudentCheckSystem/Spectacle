@@ -5,10 +5,28 @@
   .remove-list-margin {
     margin: 0 !important;
   }
+  .sync {
+    color: #000000;
+  }
+  .local {
+    color: #4cd964;
+  }
+  .new {
+    color: #ff3b30;
+  }
   .active {
-    background-color: #007aff;
     color: #FFFFFF;
   }
+  .active, .sync {
+    background-color: #007aff;
+  }
+  .active, .local {
+    background-color: #4cd964;
+  }
+  .active, .new {
+    background-color: #ff3b30;
+  }
+  /* TODO make this work! actually display the color */
 </style>
 
 <style>
@@ -38,7 +56,7 @@
     >
       <f7-list>
         <f7-list-item media-item
-                      v-for="e in events" swipeout :title="e.name"
+                      v-for="e in mergedEvents" swipeout :title="e.name"
                       :subtitle="e.description || 'Event'"
                       :badge="e.status === 0 ? 'Future' : e.status === 1 ? 'Boarding' : 'Complete'"
                       :badge-color="e.status === 0 ? 'blue' : e.status === 1 ? 'red' : 'green'"
@@ -100,7 +118,7 @@
         },
         computed: {
             ...mapGetters([
-                'events',
+                'mergedEvents',
                 'currentEvent'
             ])
         },

@@ -88,6 +88,12 @@ const getters = {
     },
     brokenEvents (state) {
         return state.broken
+    },
+    mergedEvents (state) {
+        return state.events.map((remoteEvent) => {
+            const localEvent = state.localEvents.find((localE) => localE.localId === remoteEvent.id)
+            return localEvent || remoteEvent
+        })
     }
 }
 
