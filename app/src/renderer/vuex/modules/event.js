@@ -98,8 +98,10 @@ const getters = {
 }
 
 const actions = {
-    async refreshEvents ({commit}) {
-        commit(types.SET_ALL_EVENTS, {events: await api.listAllEvents()})
+    async refreshEvents ({commit, rootState}) {
+        if (!rootState.auth.offline) {
+            commit(types.SET_ALL_EVENTS, {events: await api.listAllEvents()})
+        }
     },
     async pullCurrentEvent ({state, dispatch, commit, rootState}, {id}) {
         const cachedLocalEvent = state.localEvents.find((element) => element.id === id)

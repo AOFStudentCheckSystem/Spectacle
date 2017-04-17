@@ -14,7 +14,7 @@ const mutations = {
         rawHttp.defaults.headers = {Authorization: token ? token.token : null}
         state.token = token
     },
-    [types.SET_OFFLINE] (state, { offline }) {
+    [types.SET_OFFLINE] (state, {offline}) {
         state.offline = offline
     },
     [types.ADD_CONSISTENCY] (state) {
@@ -46,6 +46,12 @@ const actions = {
         commit(types.SET_USER_TOKEN, {token: null})
     },
     async verify ({commit, state, dispatch}) {
+        if (!state.token) {
+            if (!state.offline) {
+                commit(types.SET_OFFLINE, {offline: true})
+            }
+            return
+        }
         try {
             const token = await api.verify()
             if (state.offline) {
@@ -58,9 +64,11 @@ const actions = {
             }
         } catch (e) {
             if (e.response) {
-                commit(types.SET_USER_TOKEN, {token: null})
-                console.error(e.request)
-                console.log('token expired')
+                if (state.token) {
+                    commit(types.SET_USER_TOKEN, {token: null})
+                    console.error(e.request)
+                    console.log('token expired')
+                }
             } else {
                 if (!state.offline) {
                     console.error(e)
