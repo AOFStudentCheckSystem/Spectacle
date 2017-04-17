@@ -8,5 +8,7 @@ export class Student {
         this.firstName = json.firstName
         this.preferredName = json.preferredName
         this.cardSecret = json.cardSecret
+        this.email = json.email
+        this.dirty = false
     }
 }

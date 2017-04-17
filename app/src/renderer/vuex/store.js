@@ -7,6 +7,6 @@ export default {
     actions,
     getters,
     modules,
-    plugins: [plugins.authStoragePlugin],
+    plugins: Object.keys(plugins).map((key) => plugins[key]),
     strict: process.env.NODE_ENV !== 'production'
 }
