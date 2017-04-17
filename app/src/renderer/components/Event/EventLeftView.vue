@@ -14,13 +14,13 @@
   .active {
     color: #FFFFFF;
   }
-  .active, .sync {
+  .active.sync {
     background-color: #007aff;
   }
-  .active, .local {
+  .active.local {
     background-color: #4cd964;
   }
-  .active, .new {
+  .active.new {
     background-color: #ff3b30;
   }
   .list-block {
@@ -41,7 +41,7 @@
       Searchbar to search thorugh VL Items
       List to search specified in "search-list" prop
     -->
-    <f7-searchbar cancel-link="Cancel" search-list="#search-list"></f7-searchbar>
+    <f7-searchbar cancel-link="Cancel" :params="{ searchList: '#search-list', searchIn: '.item-title, .badge'}"></f7-searchbar>
 
     <!-- This block will become visible when there is nothing found -->
     <f7-list class="searchbar-not-found">
@@ -56,15 +56,13 @@
     >
       <f7-list>
         <f7-list-item media-item
-                      v-for="e in mergedEvents" swipeout :title="e.name"
+                      v-for="e in mergedEvents" :title="e.name"
                       :subtitle="e.description || 'Event'"
                       :badge="e.status === 0 ? 'Future' : e.status === 1 ? 'Boarding' : 'Complete'"
                       :badge-color="e.status === 0 ? 'blue' : e.status === 1 ? 'red' : 'green'"
                       @click="onClick(e.id)"
                       class="item-link"
-                      :class="{
-                          'active': currentEvent ? currentEvent.id === e.id : false
-                      }"
+                      :class="classObjForEvent(e)"
         >
         </f7-list-item>
       </f7-list>
@@ -74,23 +72,17 @@
 
 <script>
     import {mapActions, mapGetters} from 'vuex'
+    import {ActivityEvent, LocalEvent} from '../../models/event'
+    import {EventBusMixin} from '../../mixins/event-bus'
+//    import CreatePopup from './CreatePopup.vue'
+
     export default {
+//        components: {CreatePopup},
+        mixins: [EventBusMixin],
         methods: {
-            addNewItem: function () {
-                let self = this
-                self.items.push({
-                    title: 'Item ' + (self.items.length + 1),
-                    subtitle: 'Subtitle ' + (self.items.length + 1)
-                })
-            },
-            // Function to proceed search results
-            searchAll: function (query) {
-                let self = this
-                let found = []
-                for (let i = 0; i < self.items.length; i++) {
-                    if (self.items[i].title.indexOf(query) >= 0 || query.trim() === '') found.push(i)
-                }
-                return found
+            addNewItem () {
+//                this.$refs['popup'].open()
+                this.$publish(this.$channels.OPEN_EVENT_POPUP)
             },
             ...mapActions([
                 'refreshEvents'
@@ -113,6 +105,14 @@
                     }).catch((e) => {
                         console.log(e)
                     })
+                }
+            },
+            classObjForEvent (event) {
+                return {
+                    'active': this.currentEvent ? this.currentEvent.id === event.id : false,
+                    'new': event instanceof LocalEvent && !event.hasRemote,
+                    'sync': (event instanceof ActivityEvent),
+                    'local': event instanceof LocalEvent && event.hasRemote
                 }
             }
         },

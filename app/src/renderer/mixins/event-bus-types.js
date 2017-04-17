@@ -5,7 +5,8 @@ let c = 0
 
 const $channels = {
     'LEFT_VIEW_ENABLE': c++,
-    'LEFT_VIEW_ROUTE': c++
+    'LEFT_VIEW_ROUTE': c++,
+    'OPEN_EVENT_POPUP': c++
 }
 
 export default $channels

@@ -6,7 +6,7 @@ const state = {
     token: null,
     // unauthenticated or network offline !!! application working in offline mode
     offline: true,
-    consistency: 0,
+    consistency: 4,
     // network online, can sign in !!! should only be used for sign in
     online: false,
     signingIn: false
@@ -71,7 +71,7 @@ const actions = {
             const token = await api.verify()
             if (state.offline) {
                 commit(types.ADD_CONSISTENCY)
-                if (state.consistency > 5) {
+                if (state.consistency > 4) {
                     commit(types.SET_USER_TOKEN, {token: token})
                     commit(types.SET_OFFLINE, {offline: false})
                     dispatch('syncLocalEvents')

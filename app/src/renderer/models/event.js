@@ -40,6 +40,7 @@ export class LocalEvent {
             this.time = remoteEvent.time
             this.status = remoteEvent.status
             this.description = remoteEvent.description
+            this.records = remoteEvent.records ? JSON.parse(JSON.stringify(remoteEvent.records)) : []
         } else {
             this.hasRemote = false
             this.dirty = true
@@ -49,8 +50,8 @@ export class LocalEvent {
             this.time = new Date().getTime()
             this.status = 0
             this.description = ''
+            this.records = []
         }
-        this.records = remoteEvent.records ? JSON.parse(JSON.stringify(remoteEvent.records)) : []
     }
 }
 

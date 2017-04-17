@@ -98,6 +98,26 @@ const getters = {
 }
 
 const actions = {
+    async createEvent ({commit, rootState, dispatch}, {event}) {
+        if (rootState.auth.offline) {
+            commit(types.ADD_TO_LOCAL_EVENTS, event)
+            return
+        }
+        try {
+            const submittedEvent = await api.createEvent(event)
+            if (submittedEvent instanceof ActionResult) {
+                console.error(event)
+                commit(types.APPEND_BROKEN_EVENT, {broken: event})
+                commit(types.ADD_TO_LOCAL_EVENTS, event)
+                return
+            }
+            await dispatch('refreshEvents')
+        } catch (e) {
+            console.error(e, event)
+            commit(types.APPEND_BROKEN_EVENT, {broken: event})
+            commit(types.ADD_TO_LOCAL_EVENTS, event)
+        }
+    },
     async refreshEvents ({commit, rootState}) {
         if (!rootState.auth.offline) {
             commit(types.SET_ALL_EVENTS, {events: await api.listAllEvents()})
@@ -194,50 +214,54 @@ const actions = {
     },
     async syncLocalEvents ({commit, state, dispatch, rootState}) {
         if (!rootState.auth.offline) {
-            const toRemove = await state.localEvents.reduce(async (acc, element) => {
-                try {
-                    let eventId = element.localId
-                    if (!element.hasRemote) {
-                        eventId = await api.createEvent(element)
-                    }
-                    if (eventId instanceof ActionResult) {
-                        console.error(eventId)
-                        console.error(element)
-                        commit(types.APPEND_BROKEN_EVENT, {broken: element})
-                    }
-                    element.id = eventId
-                    const editResult = api.editEvent(element, element)
-                    if (!editResult.success) {
-                        console.error('failed to push edits for', element)
-                        commit(types.APPEND_BROKEN_EVENT, {broken: element})
-                    }
-                    if (event.records && event.records.length > 0 && event.status < 2) {
-                        const recordResult = await checkApi.submitRecords(element, element.records)
-                        if (recordResult) {
-                            acc.push(element)
-                        } else {
-                            console.error('failed to push records for', element)
+            const toRemove = []
+            if (state.localEvents) {
+                const duplicateLocalEvents = JSON.parse(JSON.stringify(state.localEvents))
+                for (const element of duplicateLocalEvents) {
+                    try {
+                        let eventId = element.localId
+                        if (!element.hasRemote) {
+                            eventId = await api.createEvent(element)
+                        }
+                        if (eventId instanceof ActionResult) {
+                            console.error(eventId)
+                            console.error(element)
                             commit(types.APPEND_BROKEN_EVENT, {broken: element})
                         }
-                    } else {
-                        acc.push(element)
+                        element.id = eventId
+                        const editResult = await api.editEvent(element, element)
+                        if (!editResult.success) {
+                            console.error('failed to push edits for', element)
+                            commit(types.APPEND_BROKEN_EVENT, {broken: element})
+                        }
+                        if (event.records && event.records.length > 0 && event.status < 2) {
+                            const recordResult = await checkApi.submitRecords(element, element.records)
+                            if (recordResult) {
+                                toRemove.push(element)
+                            } else {
+                                console.error('failed to push records for', element)
+                                commit(types.APPEND_BROKEN_EVENT, {broken: element})
+                            }
+                        } else {
+                            toRemove.push(element)
+                        }
+                    } catch (e) {
+                        console.error('encounted an error whilst synchronizing', element, e)
+                        commit(types.APPEND_BROKEN_EVENT, {broken: element})
                     }
-                } catch (e) {
-                    console.error('encounted an error whilst synchronizing', element, e)
-                    commit(types.APPEND_BROKEN_EVENT, {broken: element})
                 }
-                return acc
-            }, [])
-            toRemove.forEach((event) => {
-                commit(types.REMOVE_FROM_LOCAL_EVENTS, event)
-            })
+                toRemove.forEach((event) => {
+                    commit(types.REMOVE_FROM_LOCAL_EVENTS, {localEvent: event})
+                })
+            }
             await dispatch('refreshEvents')
-            if (state.currentEvent && state.currentEvent instanceof LocalEvent) {
-                const instanceInToRemove = toRemove.find((e) => e.localId === state.currentEvent.localId)
+            const currentEvent = state.currentEvent
+            if (currentEvent && currentEvent instanceof LocalEvent) {
+                const instanceInToRemove = toRemove.find((e) => e.localId === currentEvent.localId)
                 if (instanceInToRemove) {
                     try {
                         await dispatch('pullCurrentEvent', {id: instanceInToRemove.id})
-                        console.log('successfully resynced currentEvent')
+                        console.log('successfully resynced', currentEvent)
                     } catch (e) {
                         commit(types.APPEND_BROKEN_EVENT, {broken: instanceInToRemove})
                         console.error(e)
