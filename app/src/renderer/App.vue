@@ -19,10 +19,10 @@
     -webkit-user-select: none;
     -webkit-app-region: no-drag;
   }
+  .navbar {
+    -webkit-app-region: drag;
+  }
 </style>
 
 <style scoped>
-  .nav-bar {
-    -webkit-app-region: drag;
-  }
 </style>

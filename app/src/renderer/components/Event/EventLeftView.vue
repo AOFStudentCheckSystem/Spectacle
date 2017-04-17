@@ -2,9 +2,6 @@
 * Created by dummy on 4/14/17.
 */
 <style scoped>
-  .remove-list-margin {
-    margin: 0 !important;
-  }
   .sync {
     color: #000000;
   }
@@ -26,13 +23,16 @@
   .active, .new {
     background-color: #ff3b30;
   }
+  .list-block {
+    margin-top: 0 !important;
+  }
+  .remove-list-margin {
+    margin: 0 !important;
+  }
   /* TODO make this work! actually display the color */
 </style>
 
 <style>
-  .list-block {
-    margin: 0 !important;
-  }
 </style>
 
 <template>
