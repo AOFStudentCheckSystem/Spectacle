@@ -100,7 +100,7 @@ const getters = {
 const actions = {
     async createEvent ({commit, rootState, dispatch}, {event}) {
         if (rootState.auth.offline) {
-            commit(types.ADD_TO_LOCAL_EVENTS, event)
+            commit(types.ADD_TO_LOCAL_EVENTS, {localEvent: event})
             return
         }
         try {
@@ -108,14 +108,16 @@ const actions = {
             if (submittedEvent instanceof ActionResult) {
                 console.error(event)
                 commit(types.APPEND_BROKEN_EVENT, {broken: event})
-                commit(types.ADD_TO_LOCAL_EVENTS, event)
-                return
+                commit(types.ADD_TO_LOCAL_EVENTS, {localEvent: event})
+            } else {
+                await dispatch('refreshEvents')
             }
-            await dispatch('refreshEvents')
         } catch (e) {
-            console.error(e, event)
-            commit(types.APPEND_BROKEN_EVENT, {broken: event})
-            commit(types.ADD_TO_LOCAL_EVENTS, event)
+            if (e.response) {
+                console.error(e, event)
+                commit(types.APPEND_BROKEN_EVENT, {broken: event})
+            }
+            commit(types.ADD_TO_LOCAL_EVENTS, {localEvent: event})
         }
     },
     async refreshEvents ({commit, rootState}) {
