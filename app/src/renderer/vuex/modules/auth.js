@@ -54,7 +54,9 @@ const actions = {
     async authenticate ({commit}, {email, password}) {
         commit(types.SET_SIGNING_IN, {signingIn: true})
         commit(types.SET_USER_TOKEN, {token: await api.authenticate(email, password)})
-        commit(types.SET_SIGNING_IN, {signingIn: false})
+        window.setTimeout(() => {
+            commit(types.SET_SIGNING_IN, {signingIn: false})
+        }, 10000)
     },
     async signOut ({commit}) {
         await api.signOut()

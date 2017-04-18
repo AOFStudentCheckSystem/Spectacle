@@ -97,6 +97,12 @@ const getters = {
         return state.events.map((remoteEvent) => {
             const localEvent = state.localEvents.find((localE) => localE.localId === remoteEvent.id)
             return localEvent || remoteEvent
+        }).sort(function (x, y) {
+            if (x.status === 2 || y.status === 2) {
+                return x.status === y.status ? (x.time - y.time) : (y.status - x.status)
+            } else {
+                return x.status === y.status ? (y.time - x.time) : (x.status - y.status)
+            }
         })
     }
 }

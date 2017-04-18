@@ -9,7 +9,7 @@
 
 <template>
   <f7-view navbar-through ref="view" :class="styleClassObject" :animate-pages="false" :preloadPreviousPage="false" :swipeBackPage="false">
-    <f7-navbar title="Events" slide>
+    <f7-navbar title="Spectacle" slide>
       <f7-nav-right>
         <!-- Add new VL item on click -->
         <f7-link @click="addNewItem">

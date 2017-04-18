@@ -95,12 +95,15 @@
                 const foundStudent = cardSecretStudentMap[cardSecret.toLowerCase()] ||
                     cardSecretStudentMap[cardSecret.toUpperCase()]
                 if (foundStudent && this.currentEvent) {
-                    this.$store.dispatch('addEventRecord', new ActivityEventRecord({
-                        student: foundStudent,
-                        signUpTime: -1,
-                        checkInTime: new Date().getTime()
-                    }))
+                    this.$store.dispatch('addEventRecord', {
+                        record: new ActivityEventRecord({
+                            student: foundStudent,
+                            signUpTime: -1,
+                            checkInTime: new Date().getTime()
+                        })
+                    })
                 } else {
+//                    this.$store.dispatch('addEventRecord', {record: null})
                     // TODO edit student and student persistenct... ahh fuck
                 }
             }

@@ -54,21 +54,35 @@ function localStoragePatchPlugin (typeMutatePatch, stateGetter, typeMutateAll) {
 }
 
 export const authStoragePlugin = localStoragePlugin(types.SET_USER_TOKEN, ({token}) => {
-    return {token: new UserToken(token)}
+    return {token: token ? new UserToken(token) : token}
 })
 export const localEventStoragePlugin = localStoragePlugin(types.SET_LOCAL_EVENTS, ({localEvents}) => {
+    if (!localEvents) {
+        return localEvents
+    }
     return {localEvents: localEvents.map(localEvent => new LocalEvent(localEvent))}
 })
 export const eventStoragePlugin = localStoragePlugin(types.SET_ALL_EVENTS, ({events}) => {
+    if (!events) {
+        return events
+    }
     return {events: events.map(remoteEvent => new ActivityEvent(remoteEvent))}
 })
 export const studentStoragePlugin = localStoragePlugin(types.SET_ALL_STUDENTS, ({students}) => {
+    if (!students) {
+        return students
+    }
     return {students: students.map(student => new Student(student))}
 })
 export const brokenEventStoragePlugin = localStoragePlugin(types.SET_BROKEN_EVENTS, ({events}) => {
-    return {events: events.map((brokenEvent) => {
-        return !brokenEvent.hasRemote && brokenEvent.id ? new ActivityEvent(brokenEvent) : new LocalEvent(brokenEvent)
-    })}
+    if (!events) {
+        return events
+    }
+    return {
+        events: events.map((brokenEvent) => {
+            return !brokenEvent.hasRemote && brokenEvent.id ? new ActivityEvent(brokenEvent) : new LocalEvent(brokenEvent)
+        })
+    }
 })
 
 export const brokenEventPatchPersistencePlugin = localStoragePatchPlugin(types.APPEND_BROKEN_EVENT,

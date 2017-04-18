@@ -10,7 +10,7 @@
     <f7-list form tablet-inset v-show="currentEvent">
       <f7-list-item>
         <f7-label>Name</f7-label>
-        <f7-input v-model="name" type="text" placeholder="Name" @input="throttledEditName"></f7-input>
+        <f7-input v-model="name" type="textarea" placeholder="Name" @input="throttledEditName"></f7-input>
       </f7-list-item>
       <f7-list-item>
         <f7-label>Description</f7-label>

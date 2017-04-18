@@ -2,13 +2,13 @@
     <f7-page>
         <f7-block-title>Events</f7-block-title>
         <f7-list tablet-inset>
-            <f7-list-item title="Item 1"></f7-list-item>
-            <f7-list-item title="Item 2"></f7-list-item>
+            <f7-list-item title="Export Errored Events"></f7-list-item>
+            <f7-list-item title="Empty Persistence Store"></f7-list-item>
         </f7-list>
-        <f7-block-title>Students</f7-block-title>
+        <f7-block-title>Subjects</f7-block-title>
         <f7-list tablet-inset>
-            <f7-list-item title="Item 1"></f7-list-item>
-            <f7-list-item title="Item 2"></f7-list-item>
+            <f7-list-item title="Export Errored Students"></f7-list-item>
+            <f7-list-item title="Empty Persistence Store"></f7-list-item>
         </f7-list>
         <f7-block-title>Authentication</f7-block-title>
         <f7-list tablet-inset>

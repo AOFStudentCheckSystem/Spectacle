@@ -12,7 +12,7 @@
             <!--<f7-link href="/event/edit/">Edit</f7-link>-->
             <!--</f7-nav-left>-->
             <f7-nav-center sliding>{{ computedTitle }}</f7-nav-center>
-            <f7-nav-right v-if="currentEvent">
+            <f7-nav-right v-if="currentEvent && currentEvent.status < 2">
                 <f7-link href="/event/check/">Check In</f7-link>
             </f7-nav-right>
         </f7-navbar>
