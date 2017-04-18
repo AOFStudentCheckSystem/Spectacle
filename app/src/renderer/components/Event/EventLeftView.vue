@@ -70,6 +70,7 @@
                     @click="onClick(e.id)"
                     class="item-link"
                     :class="classObjForEvent(e)"
+                    :swipeout="e.status < 2"
       >
       </f7-list-item>
     </f7-list>

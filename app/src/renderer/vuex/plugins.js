@@ -115,6 +115,15 @@ export const studentPatchPersistencePlugin = localStoragePatchPlugin(types.PATCH
         return {students: store.state.student.students}
     }, types.SET_ALL_STUDENTS)
 
+export const localRecordPersistencePlugin = localStoragePatchPlugin(types.ADD_EVENT_RECORD,
+    store => {
+        return {localEvents: store.state.event.localEvents}
+    }, types.SET_LOCAL_EVENTS)
+
+export const remoteRecordPersistencePlugin = localStoragePatchPlugin(types.ADD_EVENT_RECORD,
+    store => {
+        return {events: store.state.event.events}
+    }, types.SET_ALL_EVENTS)
 // export const eventBrokenPersistencePlugin = store => {
 //     const deserialize = JSON.parse
 //     const serialize = JSON.stringify

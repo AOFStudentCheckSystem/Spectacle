@@ -1,7 +1,11 @@
 export const SET_USER_TOKEN = 'SET_USER_TOKEN'
 export const SET_ALL_EVENTS = 'SET_ALL_EVENTS'
+
 export const SET_CURRENT_EVENT = 'SET_CURRENT_EVENT'
+
+export const PATCH_EVENT = 'PATCH_EVENT'
 export const PATCH_CURRENT_EVENT = 'PATCH_CURRENT_EVENT'
+
 export const SET_SIGNING_IN = 'SET_SIGNING_IN'
 
 export const SET_OFFLINE = 'SET_OFFLINE'

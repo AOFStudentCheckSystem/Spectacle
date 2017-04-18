@@ -18,7 +18,7 @@
     }"></f7-searchbar>
 
     <!-- This block will become visible when there is nothing found -->
-    <f7-list class="check-searchbar-not-found" tablet-inset>
+    <f7-list class="searchbar-not-found check-searchbar-not-found" tablet-inset>
       <f7-list-item title="Nothing found"></f7-list-item>
     </f7-list>
 
@@ -33,15 +33,13 @@
                     :subtitle="e.student.preferredName || e.student.firstName"
                     :badge="e.checkInTime >= 0 ? 'Checked' : 'Removed'"
                     :badge-color="e.checkInTime >= 0 ? 'blue' : 'red'"
-                    @click="onClick(e.id)"
-                    class="item-link"
-                    :swipeout="e.checkInTime >= 0"
+                    swipeout
       >
         <f7-swipeout-actions right v-if="e.checkInTime >= 0">
-          <f7-swipeout-button close color="red" @click="removeSwiped(e.student)">Remove</f7-swipeout-button>
+          <f7-swipeout-button close overswipe color="red" @click="removeSwiped(e.student)">Remove</f7-swipeout-button>
         </f7-swipeout-actions>
         <f7-swipeout-actions left v-if="e.checkInTime < 0">
-          <f7-swipeout-button close color="blue" @click="addSwiped(e.student)">Add</f7-swipeout-button>
+          <f7-swipeout-button close overswipe color="blue" @click="addSwiped(e.student)">Add</f7-swipeout-button>
         </f7-swipeout-actions>
       </f7-list-item>
     </f7-list>
@@ -70,6 +68,9 @@
             ]),
             computedTitle () {
                 return this.currentEvent ? this.currentEvent.name : ''
+            },
+            checkable () {
+                return this.currentEvent ? this.currentEvent.status < 2 : false
             }
         },
         methods: {
@@ -77,34 +78,44 @@
                 this.pageActive = active
             },
             removeSwiped (student) {
-                this.$store.dispatch('addEventRecord', new ActivityEventRecord({
-                    student: student,
-                    signUpTime: -1,
-                    checkInTime: -(new Date().getTime())
-                }))
-            },
-            addSwiped (student) {
-                this.$store.dispatch('addEventRecord', new ActivityEventRecord({
-                    student: student,
-                    signUpTime: -1,
-                    checkInTime: new Date().getTime()
-                }))
-            },
-            addRecord (cardSecret) {
-                const cardSecretStudentMap = this.cardSecretStudentMap
-                const foundStudent = cardSecretStudentMap[cardSecret.toLowerCase()] ||
-                    cardSecretStudentMap[cardSecret.toUpperCase()]
-                if (foundStudent && this.currentEvent) {
+                if (this.checkable) {
                     this.$store.dispatch('addEventRecord', {
                         record: new ActivityEventRecord({
-                            student: foundStudent,
+                            student: student,
+                            signUpTime: -1,
+                            checkInTime: -(new Date().getTime())
+                        })
+                    })
+                }
+            },
+            addSwiped (student) {
+                if (this.checkable) {
+                    this.$store.dispatch('addEventRecord', {
+                        record: new ActivityEventRecord({
+                            student: student,
                             signUpTime: -1,
                             checkInTime: new Date().getTime()
                         })
                     })
-                } else {
+                }
+            },
+            addRecord (cardSecret) {
+                if (this.checkable) {
+                    const cardSecretStudentMap = this.cardSecretStudentMap
+                    const foundStudent = cardSecretStudentMap[cardSecret.toLowerCase()] ||
+                        cardSecretStudentMap[cardSecret.toUpperCase()]
+                    if (foundStudent && this.currentEvent) {
+                        this.$store.dispatch('addEventRecord', {
+                            record: new ActivityEventRecord({
+                                student: foundStudent,
+                                signUpTime: -1,
+                                checkInTime: new Date().getTime()
+                            })
+                        })
+                    } else {
 //                    this.$store.dispatch('addEventRecord', {record: null})
-                    // TODO edit student and student persistenct... ahh fuck
+                        // TODO edit student and student persistenct... ahh fuck
+                    }
                 }
             }
         },

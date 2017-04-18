@@ -38,6 +38,23 @@ const mutations = {
             state.currentEvent.dirty = true
         }
     },
+    [types.PATCH_EVENT] (state, {event, patch}) {
+        if (patch.name) {
+            event.name = patch.name
+        }
+        if (patch.time) {
+            event.time = patch.time
+        }
+        if (patch.description) {
+            event.description = patch.description
+        }
+        if (patch.status) {
+            event.status = patch.status
+        }
+        if (state.currentEvent instanceof LocalEvent) {
+            event.dirty = true
+        }
+    },
     [types.ADD_EVENT_RECORD] (state, {record}) {
         const currentEvent = state.currentEvent
         if (currentEvent) {
@@ -94,15 +111,13 @@ const getters = {
         return state.broken
     },
     mergedEvents (state) {
-        return state.events.map((remoteEvent) => {
+        return state.localEvents.filter((localEvent) => !localEvent.hasRemote).concat(state.events.map((remoteEvent) => {
             const localEvent = state.localEvents.find((localE) => localE.localId === remoteEvent.id)
             return localEvent || remoteEvent
-        }).sort(function (x, y) {
-            if (x.status === 2 || y.status === 2) {
-                return x.status === y.status ? (x.time - y.time) : (y.status - x.status)
-            } else {
-                return x.status === y.status ? (y.time - x.time) : (x.status - y.status)
-            }
+        })).sort(function (x, y) {
+            const xStatus = x.status === 2 ? -1 : x.status
+            const yStatus = y.status === 2 ? -1 : y.status
+            return xStatus === yStatus ? (x.time - y.time) : (xStatus - yStatus)
         })
     }
 }
@@ -132,7 +147,15 @@ const actions = {
     },
     async refreshEvents ({commit, rootState}) {
         if (!rootState.auth.offline) {
-            commit(types.SET_ALL_EVENTS, {events: await api.listAllEvents()})
+            // const currentEvent = state.currentEvent
+            // commit(types.SET_ALL_EVENTS, {
+            //     events: (await api.listAllEvents()).filter((event) => {
+            //         return !currentEvent || event.id !== currentEvent.id
+            //     }).concat(currentEvent ? [currentEvent] : [])
+            // })
+            commit(types.SET_ALL_EVENTS, {
+                events: await api.listAllEvents()
+            })
         }
     },
     async pullCurrentEvent ({state, dispatch, commit, rootState}, {id}) {
@@ -141,6 +164,11 @@ const actions = {
 
         if (cachedLocalEvent) {
             commit(types.SET_CURRENT_EVENT, {event: cachedLocalEvent})
+            return
+        }
+
+        if (cachedEvent && cachedEvent.status > 1) {
+            commit(types.SET_CURRENT_EVENT, {event: cachedEvent})
             return
         }
 
@@ -155,18 +183,32 @@ const actions = {
                 commit(types.SET_CURRENT_EVENT, {event: cachedEvent})
 
                 const remoteEvent = await api.pullEvent(id)
-                if (!(
-                        remoteEvent.id === cachedEvent.id &&
-                        remoteEvent.name === cachedEvent.name &&
-                        remoteEvent.description === cachedEvent.description &&
-                        remoteEvent.status === cachedEvent.status &&
-                        remoteEvent.time === cachedEvent.time
-                    )) {
+                remoteEvent.records = await checkApi.getRecords(remoteEvent.id)
+                const compareRecords = (x, y) => {
+                    if (x.length !== y.length) return false
+                    let objectsAreSame = true
+                    for (let propertyName of x) {
+                        if (x[propertyName] !== y[propertyName]) {
+                            objectsAreSame = false
+                            break
+                        }
+                    }
+                    return objectsAreSame
+                }
+
+                if (cachedEvent instanceof LocalEvent ||
+                    cachedEvent.name !== remoteEvent.name ||
+                    cachedEvent.id !== remoteEvent.id ||
+                    cachedEvent.description !== remoteEvent.description ||
+                    cachedEvent.time !== remoteEvent.time ||
+                    !compareRecords(cachedEvent.records, remoteEvent.records)
+                ) {
                     commit(types.SET_CURRENT_EVENT, {event: remoteEvent})
-                    await dispatch('refreshEvents')
                 }
             } else {
-                commit(types.SET_CURRENT_EVENT, {event: await api.pullEvent(id)})
+                const remoteEvent = await api.pullEvent(id)
+                remoteEvent.records = await checkApi.getRecords(remoteEvent.id)
+                commit(types.SET_CURRENT_EVENT, {event: remoteEvent})
             }
         }
     },
@@ -175,6 +217,18 @@ const actions = {
     },
     async patchCurrentEvent ({commit, state, dispatch, rootState}, payload) {
         const currentEvent = state.currentEvent
+
+        if (!currentEvent) {
+            commit(types.APPEND_BROKEN_EVENT, {broken: currentEvent})
+            console.error('the current event is gone', payload)
+            return
+        }
+
+        if (currentEvent.status > 1) {
+            commit(types.APPEND_BROKEN_EVENT, {broken: currentEvent})
+            console.error('the current event is complete')
+        }
+
         if (currentEvent instanceof LocalEvent) {
             commit(types.PATCH_CURRENT_EVENT, payload)
             return
@@ -203,11 +257,48 @@ const actions = {
             commit(types.APPEND_BROKEN_EVENT, {broken: {patch: payload.patch, event: currentEvent}})
             commit(types.PATCH_CURRENT_EVENT, {patch: previousState})
             console.error(e)
+            dispatch('refreshEvents')
         }
-        dispatch('refreshEvents')
+    },
+    async patchEvent ({commit, rootState}, {event, patch}) {
+        if (event.status > 1) {
+            commit(types.APPEND_BROKEN_EVENT, {broken: event})
+            console.error('event is complete')
+            return
+        }
+
+        if (event instanceof LocalEvent) {
+            commit(types.PATCH_EVENT, {event, patch})
+            return
+        }
+        if (rootState.auth.offline && event instanceof ActivityEvent) {
+            commit(types.ADD_TO_LOCAL_EVENTS, {localEvent: new LocalEvent(event)})
+            commit(types.PATCH_EVENT, {event, patch})
+            return
+        }
+
+        const previousState = new ActivityEvent(event)
+        try {
+            commit(types.PATCH_EVENT, {event, patch})
+            await api.editEvent(event, patch)
+        } catch (e) {
+            if (!e.response && event instanceof ActivityEvent) {
+                commit(types.PATCH_EVENT, {event, patch: previousState})
+                commit(types.ADD_TO_LOCAL_EVENTS, {localEvent: new LocalEvent(state)})
+                return
+            }
+            commit(types.APPEND_BROKEN_EVENT, {broken: {patch: patch, event: event}})
+            commit(types.PATCH_EVENT, {event, patch: previousState})
+            console.error(e)
+        }
     },
     async addEventRecord ({commit, state, rootState}, {record}) {
         const currentEvent = state.currentEvent
+
+        if (currentEvent.status > 1) {
+            console.error('the current event is complete')
+        }
+
         if (currentEvent instanceof LocalEvent) {
             commit(types.ADD_EVENT_RECORD, {record})
             return
@@ -249,9 +340,15 @@ const actions = {
                             eventId = await api.createEvent(element)
                         }
                         if (eventId instanceof ActionResult) {
-                            console.error(eventId)
-                            console.error(element)
+                            console.error(eventId, element)
                             commit(types.APPEND_BROKEN_EVENT, {broken: element})
+                            continue
+                        }
+                        if (element.status > 1 && element.hasRemote) {
+                            commit(types.APPEND_BROKEN_EVENT, {broken: element})
+                            toRemove.push(element)
+                            console.error('edited or checked in for completed event')
+                            continue
                         }
                         element.id = eventId
                         const editResult = await api.editEvent(element, element)
@@ -259,7 +356,7 @@ const actions = {
                             console.error('failed to push edits for', element)
                             commit(types.APPEND_BROKEN_EVENT, {broken: element})
                         }
-                        if (event.records && event.records.length > 0 && event.status < 2) {
+                        if (element.records && element.records.length > 0 && element.status < 2) {
                             const recordResult = await checkApi.submitRecords(element, element.records)
                             if (recordResult) {
                                 toRemove.push(element)

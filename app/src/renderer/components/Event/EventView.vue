@@ -11,9 +11,12 @@
             <!--<f7-nav-left v-if="currentEvent">-->
             <!--<f7-link href="/event/edit/">Edit</f7-link>-->
             <!--</f7-nav-left>-->
+            <f7-nav-left v-if="currentEvent && currentEvent.status < 2">
+                <f7-link href="#" @click="completeEvent">Complete</f7-link>
+            </f7-nav-left>
             <f7-nav-center sliding>{{ computedTitle }}</f7-nav-center>
-            <f7-nav-right v-if="currentEvent && currentEvent.status < 2">
-                <f7-link href="/event/check/">Check In</f7-link>
+            <f7-nav-right v-if="currentEvent">
+                <f7-link href="/event/check/">{{ currentEvent && currentEvent.status < 2 ? 'Check In' : 'View Records'}}</f7-link>
             </f7-nav-right>
         </f7-navbar>
         <f7-pages>
@@ -72,6 +75,14 @@
             },
             setSidePanel () {
                 this.routeSidePanel('/left/event/')
+            },
+            completeEvent () {
+                this.$store.dispatch('patchEvent', {
+                    event: this.currentEvent,
+                    patch: {
+                        status: 2
+                    }
+                })
             }
         },
         watch: {

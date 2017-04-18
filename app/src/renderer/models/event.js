@@ -1,6 +1,7 @@
 /**
  * Created by dummy on 4/8/17.
  */
+import {Student} from './student'
 export class EventGroup {
     constructor (json) {
         this.id = json.id
@@ -22,7 +23,7 @@ export class ActivityEvent {
 
 export class ActivityEventRecord {
     constructor (json) {
-        this.student = json.student
+        this.student = new Student(json.student)
         // this.event = new Event(json.event)
         this.signUpTime = json.signUpTime === -1 ? -1 : new Date(json.signUpTime).getTime()
         this.checkInTime = json.checkInTime === -1 ? -1 : new Date(json.checkInTime).getTime()
