@@ -59,13 +59,15 @@ export const http = axios.create({
                 return {key: key, value: data[key]}
             }).reduce((formData, entry) => {
                 const value = entry.value
-                switch (typeof value) {
-                    case 'object':
-                        formData.append(entry.key, JSON.stringify(value))
-                        break
-                    default:
-                        formData.append(entry.key, value)
-                        break
+                if (value !== undefined && value !== null) {
+                    switch (typeof value) {
+                        case 'object':
+                            formData.append(entry.key, JSON.stringify(value))
+                            break
+                        default:
+                            formData.append(entry.key, value)
+                            break
+                    }
                 }
                 return formData
             }, new FormData())

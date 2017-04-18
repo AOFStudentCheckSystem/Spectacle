@@ -1,8 +1,8 @@
 /**
  * Created by dummy on 4/17/17.
  */
-const today = new Date()
-export const datePicker = (element, container, changeCallback) => {
+export const datePicker = (element, container, changeCallback, dateObj) => {
+    const today = dateObj || new Date()
     return {
         input: element,
         // container: container,
@@ -46,8 +46,8 @@ export const datePicker = (element, container, changeCallback) => {
     }
 }
 
-export const timePicker = (element, container, changeCallback) => {
-    const today = new Date()
+export const timePicker = (element, container, changeCallback, dateObj) => {
+    const today = dateObj || new Date()
     return {
         input: element,
         // container: container,

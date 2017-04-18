@@ -75,6 +75,7 @@ const actions = {
                     commit(types.SET_USER_TOKEN, {token: token})
                     commit(types.SET_OFFLINE, {offline: false})
                     dispatch('syncLocalEvents')
+                    dispatch('refreshStudents')
                 }
             }
             if (!state.online) {

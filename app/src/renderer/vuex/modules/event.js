@@ -39,21 +39,25 @@ const mutations = {
         }
     },
     [types.ADD_EVENT_RECORD] (state, {record}) {
-        const existingRecords = state.currentEvent.records
-            .find((rec) => rec.student.idNumber === record.student.idNumber)
-        if (existingRecords) {
-            state.currentEvent.records = state.currentEvent.records.filter((rec) => rec !== existingRecords)
-        }
-        state.currentEvent.records.unshift(record)
-        if (state.currentEvent instanceof LocalEvent) {
-            state.currentEvent.dirty = true
+        const currentEvent = state.currentEvent
+        if (currentEvent) {
+            const existingRecords = currentEvent.records
+                .find((rec) => rec.student.idNumber === record.student.idNumber)
+            if (existingRecords) {
+                currentEvent.records = currentEvent.records.filter((rec) => rec !== existingRecords)
+            }
+            currentEvent.records.unshift(record)
+            if (currentEvent instanceof LocalEvent) {
+                currentEvent.dirty = true
+            }
         }
     },
     [types.ADD_TO_LOCAL_EVENTS] (state, {localEvent}) {
+        const currentEvent = state.currentEvent
         const existingEvent = state.localEvents.find((event) => event.localId === localEvent.localId)
         if (!existingEvent) state.localEvents.unshift(localEvent)
-        if (state.currentEvent instanceof LocalEvent) {
-            state.currentEvent.dirty = true
+        if (currentEvent instanceof LocalEvent) {
+            currentEvent.dirty = true
         }
     },
     [types.REMOVE_FROM_LOCAL_EVENTS] (state, {localEvent}) {
@@ -81,7 +85,7 @@ const getters = {
         return state.currentEvent
     },
     currentEventRecords (state, getters, rootState) {
-        return state.currentEvent.records
+        return state.currentEvent ? state.currentEvent.records : []
     },
     localEvents (state) {
         return state.localEvents
@@ -164,54 +168,67 @@ const actions = {
         commit(types.SET_CURRENT_EVENT, {event: null})
     },
     async patchCurrentEvent ({commit, state, dispatch, rootState}, payload) {
-        if (state.currentEvent instanceof LocalEvent) {
+        const currentEvent = state.currentEvent
+        if (currentEvent instanceof LocalEvent) {
             commit(types.PATCH_CURRENT_EVENT, payload)
             return
         }
-        if (rootState.auth.offline && state.currentEvent instanceof ActivityEvent) {
-            commit(types.SET_CURRENT_EVENT, {event: new LocalEvent(state.currentEvent)})
+        if (rootState.auth.offline && currentEvent instanceof ActivityEvent) {
+            const localEvent = new LocalEvent(currentEvent)
+            commit(types.SET_CURRENT_EVENT, {event: localEvent})
+            commit(types.ADD_TO_LOCAL_EVENTS, {localEvent: localEvent})
             commit(types.PATCH_CURRENT_EVENT, payload)
             return
         }
+
+        const previousState = new ActivityEvent(currentEvent)
         try {
-            await api.editEvent(state.currentEvent, payload.patch)
             commit(types.PATCH_CURRENT_EVENT, payload)
+            await api.editEvent(currentEvent, payload.patch)
             // commit(types.SET_ALL_EVENTS, {events: state.events})
         } catch (e) {
-            if (!e.response && state.currentEvent instanceof ActivityEvent) {
-                commit(types.SET_CURRENT_EVENT, {event: new LocalEvent(state.currentEvent)})
-                commit(types.PATCH_CURRENT_EVENT, payload)
+            if (!e.response && currentEvent instanceof ActivityEvent) {
+                commit(types.PATCH_CURRENT_EVENT, {patch: previousState})
+                const localEvent = new LocalEvent(currentEvent)
+                commit(types.SET_CURRENT_EVENT, {event: localEvent})
+                commit(types.ADD_TO_LOCAL_EVENTS, {localEvent: localEvent})
                 return
             }
-            commit(types.APPEND_BROKEN_EVENT, {broken: {patch: payload.patch, event: state.currentEvent}})
+            commit(types.APPEND_BROKEN_EVENT, {broken: {patch: payload.patch, event: currentEvent}})
+            commit(types.PATCH_CURRENT_EVENT, {patch: previousState})
             console.error(e)
         }
         dispatch('refreshEvents')
     },
     async addEventRecord ({commit, state, rootState}, {record}) {
-        if (state.currentEvent instanceof LocalEvent) {
+        const currentEvent = state.currentEvent
+        if (currentEvent instanceof LocalEvent) {
             commit(types.ADD_EVENT_RECORD, {record})
             return
         }
-        if (rootState.auth.offline && state.currentEvent instanceof ActivityEvent) {
-            commit(types.SET_CURRENT_EVENT, {event: new LocalEvent(state.currentEvent)})
+        if (rootState.auth.offline && currentEvent instanceof ActivityEvent) {
+            const localEvent = new LocalEvent(currentEvent)
+            commit(types.SET_CURRENT_EVENT, {event: localEvent})
+            commit(types.ADD_TO_LOCAL_EVENTS, {localEvent: localEvent})
             commit(types.ADD_EVENT_RECORD, {record})
             return
         }
         try {
-            if (await checkApi.submitRecords(state.currentEvent, [record])) {
+            if (await checkApi.submitRecords(currentEvent, [record])) {
                 commit(types.ADD_EVENT_RECORD, {record})
             } else {
-                console.error('Unknown Error: some event record requests went wrong.', state.currentEvent, record)
+                console.error('Unknown Error: some event record requests went wrong.', currentEvent, record)
             }
         } catch (e) {
-            if (!e.response && state.currentEvent instanceof ActivityEvent) {
-                commit(types.SET_CURRENT_EVENT, {event: new LocalEvent(state.currentEvent)})
+            if (!e.response && currentEvent instanceof ActivityEvent) {
+                const localEvent = new LocalEvent(currentEvent)
+                commit(types.SET_CURRENT_EVENT, {event: localEvent})
+                commit(types.ADD_TO_LOCAL_EVENTS, {localEvent: localEvent})
                 commit(types.ADD_EVENT_RECORD, {record})
                 return
             }
             console.log(e)
-            commit(types.APPEND_BROKEN_EVENT, {broken: state.currentEvent})
+            commit(types.APPEND_BROKEN_EVENT, {broken: currentEvent})
         }
     },
     async syncLocalEvents ({commit, state, dispatch, rootState}) {

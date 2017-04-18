@@ -10,19 +10,23 @@ export class SmartCardController {
     /**
      * callback with reader as the first parameter
      * @param callback
-     * @returns callback id
+     * @returns () unsubscribe function
      */
     onConnect (callback) {
-        return this.__internal.addConnectCallback(callback)
+        const callbackId = this.__internal.addConnectCallback(callback)
+        const self = this
+        return () => self.removeConnectCallback(callbackId)
     }
 
     /**
      * callback with an error as the first parameter
      * @param callback
-     * @returns callback id
+     * @returns () unsubscribe function
      */
     onError (callback) {
-        return this.__internal.addErrorCallback(callback)
+        const callbackId = this.__internal.addErrorCallback(callback)
+        const self = this
+        return () => self.removeErrorCallback(callbackId)
     }
 
     /**

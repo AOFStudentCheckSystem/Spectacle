@@ -1,5 +1,4 @@
 import DetailPage from './components/Event/DetailPage.vue'
-import EditPage from './components/Event/EditPage.vue'
 import CheckPage from './components/Event/CheckPage.vue'
 
 import EventLeftView from './components/Event/EventLeftView.vue'
@@ -10,10 +9,6 @@ export default [
     {
         path: '/event/',
         component: DetailPage
-    },
-    {
-        path: '/event/edit/',
-        component: EditPage
     },
     {
         path: '/event/check/',

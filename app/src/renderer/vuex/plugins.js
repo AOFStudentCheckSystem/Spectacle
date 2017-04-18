@@ -2,15 +2,18 @@
  * Created by dummy on 4/10/17.
  */
 import * as types from './mutation-types'
+import {UserToken} from '../models/user'
+import {ActivityEvent, LocalEvent} from '../models/event'
+import {Student} from '../models/student'
 
-function localStoragePlugin (mut) {
+function localStoragePlugin (mut, preprocess) {
     const deserialize = JSON.parse
     const serialize = JSON.stringify
     return store => {
         const raw = window.localStorage.getItem(mut)
         if (raw) {
             try {
-                const saved = deserialize(raw)
+                const saved = preprocess ? preprocess(deserialize(raw)) : deserialize(raw)
                 store.commit(mut, saved)
             } catch (e) {
                 console.error(e)
@@ -50,16 +53,38 @@ function localStoragePatchPlugin (typeMutatePatch, stateGetter, typeMutateAll) {
     }
 }
 
-export const authStoragePlugin = localStoragePlugin(types.SET_USER_TOKEN)
-export const localEventStoragePlugin = localStoragePlugin(types.SET_LOCAL_EVENTS)
-export const eventStoragePlugin = localStoragePlugin(types.SET_ALL_EVENTS)
-export const studentStoragePlugin = localStoragePlugin(types.SET_ALL_STUDENTS)
-export const brokenEventStoragePlugin = localStoragePlugin(types.SET_BROKEN_EVENTS)
+export const authStoragePlugin = localStoragePlugin(types.SET_USER_TOKEN, ({token}) => {
+    return {token: new UserToken(token)}
+})
+export const localEventStoragePlugin = localStoragePlugin(types.SET_LOCAL_EVENTS, ({localEvents}) => {
+    return {localEvents: localEvents.map(localEvent => new LocalEvent(localEvent))}
+})
+export const eventStoragePlugin = localStoragePlugin(types.SET_ALL_EVENTS, ({events}) => {
+    return {events: events.map(remoteEvent => new ActivityEvent(remoteEvent))}
+})
+export const studentStoragePlugin = localStoragePlugin(types.SET_ALL_STUDENTS, ({students}) => {
+    return {students: students.map(student => new Student(student))}
+})
+export const brokenEventStoragePlugin = localStoragePlugin(types.SET_BROKEN_EVENTS, ({events}) => {
+    return {events: events.map((brokenEvent) => {
+        return !brokenEvent.hasRemote && brokenEvent.id ? new ActivityEvent(brokenEvent) : new LocalEvent(brokenEvent)
+    })}
+})
 
 export const brokenEventPatchPersistencePlugin = localStoragePatchPlugin(types.APPEND_BROKEN_EVENT,
     store => {
         return {events: store.state.event.broken}
     }, types.SET_BROKEN_EVENTS)
+
+export const localEventAddPersistencePlugin = localStoragePatchPlugin(types.REMOVE_FROM_LOCAL_EVENTS,
+    store => {
+        return {localEvents: store.state.event.localEvents}
+    }, types.SET_LOCAL_EVENTS)
+
+export const localEventRemovePersistencePlugin = localStoragePatchPlugin(types.ADD_TO_LOCAL_EVENTS,
+    store => {
+        return {localEvents: store.state.event.localEvents}
+    }, types.SET_LOCAL_EVENTS)
 
 export const localEventPatchPersistencePlugin = localStoragePatchPlugin(types.PATCH_CURRENT_EVENT,
     store => {

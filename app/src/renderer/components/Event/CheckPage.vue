@@ -6,13 +6,128 @@
 </style>
 
 <template>
-  <f7-page name="event-check">
-    <f7-navbar title="title" back-link="Back" sliding></f7-navbar>
-    nothing here
+  <f7-page name="event-check" @page:init="setPageActive(true)"
+           @page:reinit="setPageActive(true)" @page:beforeremove="setPageActive(false)">
+    <f7-navbar :title="computedTitle" back-link="Back" sliding></f7-navbar>
+
+    <f7-searchbar cancel-link="Cancel"
+                  :params="{ searchList: '#check-list',
+                  searchIn: '.item-title, .badge',
+                  notFound: '.check-searchbar-not-found',
+                  found: '.check-searchbar-found'
+    }"></f7-searchbar>
+
+    <!-- This block will become visible when there is nothing found -->
+    <f7-list class="check-searchbar-not-found" tablet-inset>
+      <f7-list-item title="Nothing found"></f7-list-item>
+    </f7-list>
+
+    <!-- Search through this list -->
+    <f7-list
+            id="check-list"
+            class="check-searchbar-found remove-list-margin"
+            media-list tablet-inset
+    >
+      <f7-list-item media-item
+                    v-for="e in currentEventRecords" :title="e.student.lastName + ', ' + e.student.firstName"
+                    :subtitle="e.student.preferredName || e.student.firstName"
+                    :badge="e.checkInTime >= 0 ? 'Checked' : 'Removed'"
+                    :badge-color="e.checkInTime >= 0 ? 'blue' : 'red'"
+                    @click="onClick(e.id)"
+                    class="item-link"
+                    :swipeout="e.checkInTime >= 0"
+      >
+        <f7-swipeout-actions right v-if="e.checkInTime >= 0">
+          <f7-swipeout-button close color="red" @click="removeSwiped(e.student)">Remove</f7-swipeout-button>
+        </f7-swipeout-actions>
+        <f7-swipeout-actions left v-if="e.checkInTime < 0">
+          <f7-swipeout-button close color="blue" @click="addSwiped(e.student)">Add</f7-swipeout-button>
+        </f7-swipeout-actions>
+      </f7-list-item>
+    </f7-list>
   </f7-page>
 </template>
 
 <script>
-    export default {}
+    import {mapGetters} from 'vuex'
+    import {SmartCardController} from '../../../smartcard/smartcard'
+    import {ActivityEventRecord} from '../../models/event'
+
+    export default {
+        data () {
+            return {
+                smart: null,
+                errorCallbackUnsubscriber: null,
+                connectCallbackUnsubscriber: null,
+                pageActive: false
+            }
+        },
+        computed: {
+            ...mapGetters([
+                'currentEvent',
+                'currentEventRecords',
+                'cardSecretStudentMap'
+            ]),
+            computedTitle () {
+                return this.currentEvent ? this.currentEvent.name : ''
+            }
+        },
+        methods: {
+            setPageActive (active) {
+                this.pageActive = active
+            },
+            removeSwiped (student) {
+                this.$store.dispatch('addEventRecord', new ActivityEventRecord({
+                    student: student,
+                    signUpTime: -1,
+                    checkInTime: -(new Date().getTime())
+                }))
+            },
+            addSwiped (student) {
+                this.$store.dispatch('addEventRecord', new ActivityEventRecord({
+                    student: student,
+                    signUpTime: -1,
+                    checkInTime: new Date().getTime()
+                }))
+            },
+            addRecord (cardSecret) {
+                const cardSecretStudentMap = this.cardSecretStudentMap
+                const foundStudent = cardSecretStudentMap[cardSecret.toLowerCase()] ||
+                    cardSecretStudentMap[cardSecret.toUpperCase()]
+                if (foundStudent && this.currentEvent) {
+                    this.$store.dispatch('addEventRecord', new ActivityEventRecord({
+                        student: foundStudent,
+                        signUpTime: -1,
+                        checkInTime: new Date().getTime()
+                    }))
+                } else {
+                    // TODO edit student and student persistenct... ahh fuck
+                }
+            }
+        },
+        created () {
+            const self = this
+            this.smart = new SmartCardController()
+            this.errorCallbackUnsubscriber = this.smart.onError((error) => {
+                console.log(error)
+            })
+            this.connectCallbackUnsubscriber = this.smart.onConnect((reader) => {
+                console.log(self.currentEvent)
+                reader.onInsert((card) => {
+                    if (self.pageActive && self.currentEvent) {
+                        self.addRecord(card.atr)
+                    }
+                })
+                reader.onError((error) => {
+                    console.log(error)
+                })
+            })
+        },
+        beforeDestroy () {
+            this.smart ? this.smart.close() : undefined
+            this.errorCallbackUnsubscriber ? this.errorCallbackUnsubscriber() : undefined
+            this.connectCallbackUnsubscriber ? this.connectCallbackUnsubscriber() : undefined
+        }
+    }
 </script>
 

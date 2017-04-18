@@ -41,6 +41,15 @@ const getters = {
     },
     currentStudent (state) {
         return state.currentStudent
+    },
+    cardSecretStudentMap (state) {
+        return state.students.reduce((acc, student) => {
+            const cardSecret = student.cardSecret
+            if (cardSecret) {
+                acc[cardSecret] = student
+            }
+            return acc
+        }, {})
     }
 }
 

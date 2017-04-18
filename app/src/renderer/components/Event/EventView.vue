@@ -7,7 +7,15 @@
 
 <template>
     <f7-view navbar-through tab active :dynamic-navbar="true" main ref="view" :class="eventClassObject" @tab:show="setSidePanel">
-        <f7-navbar title="titi" sliding></f7-navbar>
+        <f7-navbar sliding>
+            <!--<f7-nav-left v-if="currentEvent">-->
+            <!--<f7-link href="/event/edit/">Edit</f7-link>-->
+            <!--</f7-nav-left>-->
+            <f7-nav-center sliding>{{ computedTitle }}</f7-nav-center>
+            <f7-nav-right v-if="currentEvent">
+                <f7-link href="/event/check/">Check In</f7-link>
+            </f7-nav-right>
+        </f7-navbar>
         <f7-pages>
             <detail-page></detail-page>
         </f7-pages>
@@ -17,13 +25,13 @@
 <script>
     import DetailPage from './DetailPage.vue'
     import {EventBusMixin} from '../../mixins/event-bus'
+    import {mapGetters} from 'vuex'
 
     export default {
         mixins: [EventBusMixin],
         components: {DetailPage},
         data () {
             return {
-                title: 'currentEvent',
                 sidePanel: true
             }
         },
@@ -38,7 +46,13 @@
                 return {
                     'main-view': this.sidePanel
                 }
-            }
+            },
+            computedTitle () {
+                return this.currentEvent ? this.currentEvent.name : ''
+            },
+            ...mapGetters([
+                'currentEvent'
+            ])
         },
         methods: {
             routeTo (route, sidePanel) {
@@ -63,7 +77,6 @@
         watch: {
             router (newVal) {
                 if (newVal) {
-                    console.log(newVal)
                     this.setSidePanel()
                 }
             }

@@ -14,7 +14,7 @@
         </f7-nav-left>
         <f7-nav-center>Create</f7-nav-center>
         <f7-nav-right>
-          <f7-link @click="doneClicked">Done</f7-link>
+          <f7-link href="#" @click="doneClicked">Done</f7-link>
         </f7-nav-right>
       </f7-navbar>
       <f7-pages>
@@ -102,6 +102,8 @@
                     event: localEvent
                 }).then(() => {
                     self.$f7.hideIndicator()
+                    self.name = ''
+                    self.description = ''
                     self.$refs['popup'].close()
                 }).catch(() => {
                     self.$f7.hideIndicator()

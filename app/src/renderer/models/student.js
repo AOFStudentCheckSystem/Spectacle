@@ -9,6 +9,6 @@ export class Student {
         this.preferredName = json.preferredName
         this.cardSecret = json.cardSecret
         this.email = json.email
-        this.dirty = false
+        this.dirty = json.dirty || false
     }
 }
