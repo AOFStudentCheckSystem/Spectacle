@@ -18,6 +18,7 @@
       <f7-link iconF7="settings" text="Preferences" tab-link="#preference-view"></f7-link>
     </f7-toolbar>
     <create-popup ref="popup"></create-popup>
+    <select-student-popup></select-student-popup>
   </f7-views>
 </template>
 
@@ -28,9 +29,10 @@
     import PreferenceView from '../Preference/PreferenceView.vue'
     import {EventBusMixin} from '../../mixins/event-bus'
     import CreatePopup from '../Event/CreatePopup.vue'
+    import SelectStudentPopup from '../Event/SelectStudentPopup.vue'
 
     export default {
-        components: {LeftView, EventView, SubjectView, PreferenceView, CreatePopup},
+        components: {LeftView, EventView, SubjectView, PreferenceView, CreatePopup, SelectStudentPopup},
         mixins: [EventBusMixin],
         data () {
             return {

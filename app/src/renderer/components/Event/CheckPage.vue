@@ -29,7 +29,7 @@
             media-list tablet-inset
     >
       <f7-list-item media-item
-                    v-for="e in currentEventRecords" :title="e.student.lastName + ', ' + e.student.firstName"
+                    v-for="e in sortedCurrentEventRecords" :title="e.student.lastName + ', ' + e.student.firstName"
                     :subtitle="e.student.preferredName || e.student.firstName"
                     :badge="e.checkInTime >= 0 ? 'Checked' : 'Removed'"
                     :badge-color="e.checkInTime >= 0 ? 'blue' : 'red'"
@@ -48,22 +48,25 @@
 
 <script>
     import {mapGetters} from 'vuex'
-    import {SmartCardController} from '../../../smartcard/smartcard'
+    import {SmartCardController} from 'smartcard'
     import {ActivityEventRecord} from '../../models/event'
+    import {EventBusMixin} from '../../mixins/event-bus'
 
     export default {
+        mixins: [EventBusMixin],
         data () {
             return {
                 smart: null,
                 errorCallbackUnsubscriber: null,
                 connectCallbackUnsubscriber: null,
-                pageActive: false
+                pageActive: false,
+                subscription: null
             }
         },
         computed: {
             ...mapGetters([
                 'currentEvent',
-                'currentEventRecords',
+                'sortedCurrentEventRecords',
                 'cardSecretStudentMap'
             ]),
             computedTitle () {
@@ -113,8 +116,26 @@
                             })
                         })
                     } else {
-//                    this.$store.dispatch('addEventRecord', {record: null})
-                        // TODO edit student and student persistenct... ahh fuck
+                        if (!this.subscription) {
+                            this.$publish(this.$channels.SELECT_STUDENT_POPUP)
+                            const self = this
+                            this.subscription = this.$subscribe(this.$channels.SELECTED_STUDENT, ({student}) => {
+                                self.$unsubscribe(self.subscription)
+                                self.subscription = null
+                                if (student) {
+                                    this.$store.dispatch('addEventRecord', {
+                                        record: new ActivityEventRecord({
+                                            student: student,
+                                            signUpTime: -1,
+                                            checkInTime: new Date().getTime()
+                                        })
+                                    })
+                                    this.$store.dispatch('patchStudentCardSecret', {
+                                        student, cardSecret
+                                    })
+                                }
+                            })
+                        }
                     }
                 }
             }

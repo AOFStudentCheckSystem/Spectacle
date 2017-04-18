@@ -110,7 +110,7 @@ export const remoteEventPatchPersistencePlugin = localStoragePatchPlugin(types.P
         return {events: store.state.event.events}
     }, types.SET_ALL_EVENTS)
 
-export const studentPatchPersistencePlugin = localStoragePatchPlugin(types.PATCH_CURRENT_STUDENT,
+export const studentPatchPersistencePlugin = localStoragePatchPlugin(types.PATCH_STUDENT,
     store => {
         return {students: store.state.student.students}
     }, types.SET_ALL_STUDENTS)

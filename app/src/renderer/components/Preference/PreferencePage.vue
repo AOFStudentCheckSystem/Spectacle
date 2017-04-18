@@ -12,7 +12,8 @@
         </f7-list>
         <f7-block-title>Authentication</f7-block-title>
         <f7-list tablet-inset>
-            <f7-list-item link="#" @click="authenticationClicked" :title="authenticationTitle"></f7-list-item>
+            <f7-list-button @click="authenticationClicked" :title="authenticationTitle"></f7-list-button>
+            <f7-list-label>Built by Yaotian Feng, Peiqi Liu, Yuanchu Xie with ♥︎</f7-list-label>
         </f7-list>
     </f7-page>
 </template>

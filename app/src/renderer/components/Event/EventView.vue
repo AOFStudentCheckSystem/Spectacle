@@ -6,7 +6,7 @@
 </style>
 
 <template>
-    <f7-view navbar-through tab active :dynamic-navbar="true" main ref="view" :class="eventClassObject" @tab:show="setSidePanel">
+    <f7-view class="view-main" navbar-through tab active :dynamic-navbar="true" main ref="view" @tab:show="setSidePanel">
         <f7-navbar sliding>
             <!--<f7-nav-left v-if="currentEvent">-->
             <!--<f7-link href="/event/edit/">Edit</f7-link>-->
@@ -44,11 +44,6 @@
                     return this.$refs['view'].f7View.router
                 }
                 return null
-            },
-            eventClassObject () {
-                return {
-                    'main-view': this.sidePanel
-                }
             },
             computedTitle () {
                 return this.currentEvent ? this.currentEvent.name : ''

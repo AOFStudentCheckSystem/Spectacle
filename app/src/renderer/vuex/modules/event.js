@@ -117,7 +117,12 @@ const getters = {
         })).sort(function (x, y) {
             const xStatus = x.status === 2 ? -1 : x.status
             const yStatus = y.status === 2 ? -1 : y.status
-            return xStatus === yStatus ? (x.time - y.time) : (xStatus - yStatus)
+            return xStatus === yStatus ? (x.time - y.time) : yStatus - xStatus
+        })
+    },
+    sortedCurrentEventRecords (state, getters) {
+        return getters.currentEventRecords.concat().sort((a, b) => {
+            return Math.abs(a.checkInTime) - Math.abs(b.checkInTime)
         })
     }
 }
@@ -284,7 +289,9 @@ const actions = {
         } catch (e) {
             if (!e.response && event instanceof ActivityEvent) {
                 commit(types.PATCH_EVENT, {event, patch: previousState})
-                commit(types.ADD_TO_LOCAL_EVENTS, {localEvent: new LocalEvent(state)})
+                const localEvent = new LocalEvent(event)
+                commit(types.ADD_TO_LOCAL_EVENTS, {localEvent: localEvent})
+                commit(types.PATCH_EVENT, {event: localEvent, patch})
                 return
             }
             commit(types.APPEND_BROKEN_EVENT, {broken: {patch: patch, event: event}})
@@ -368,7 +375,7 @@ const actions = {
                             toRemove.push(element)
                         }
                     } catch (e) {
-                        console.error('encounted an error whilst synchronizing', element, e)
+                        console.error('encountered an error whilst synchronizing', element, e)
                         commit(types.APPEND_BROKEN_EVENT, {broken: element})
                     }
                 }
