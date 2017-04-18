@@ -12,7 +12,7 @@ export const datePicker = (element, container, changeCallback, dateObj) => {
         value: [String(today.getMonth()), today.getDate(), today.getFullYear()],
 
         onChange: function (picker, values, displayValues) {
-            let daysInMonth = new Date(picker.value[2], picker.value[0] * 1 + 1, 0).getDate()
+            let daysInMonth = new Date(picker.value[2], picker.value[0] + 1, 0).getDate()
             if (values[1] > daysInMonth) {
                 picker.cols[1].setValue(daysInMonth)
             }
@@ -24,7 +24,7 @@ export const datePicker = (element, container, changeCallback, dateObj) => {
         cols: [
             // Months
             {
-                values: ('0 1 2 3 4 5 6 7 8 9 10 11').split(' '),
+                values: ('0 1 2 3 4 5 6 7 8 9 10 11').split(' ').map(num => Number(num)),
                 displayValues: ('January February March April May June July August September October November December').split(' '),
                 textAlign: 'left'
             },

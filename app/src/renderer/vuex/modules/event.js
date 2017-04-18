@@ -11,7 +11,8 @@ const state = {
     events: [],
     currentEvent: null,
     localEvents: [],
-    broken: []
+    broken: [],
+    currentLoading: null
 }
 
 const mutations = {
@@ -91,6 +92,9 @@ const mutations = {
     },
     [types.SET_BROKEN_EVENTS] (state, {events}) {
         state.broken = events
+    },
+    [types.SET_CURRENT_LOADING] (state, {id}) {
+        state.currentLoading = id
     }
 }
 
@@ -117,7 +121,7 @@ const getters = {
         })).sort(function (x, y) {
             const xStatus = x.status === 2 ? -1 : x.status
             const yStatus = y.status === 2 ? -1 : y.status
-            return xStatus === yStatus ? (x.time - y.time) : yStatus - xStatus
+            return xStatus === yStatus ? (y.time - x.time) : yStatus - xStatus
         })
     },
     sortedCurrentEventRecords (state, getters) {
@@ -164,20 +168,14 @@ const actions = {
         }
     },
     async pullCurrentEvent ({state, dispatch, commit, rootState}, {id}) {
-        const cachedLocalEvent = state.localEvents.find((element) => element.id === id)
         const cachedEvent = state.events.find((element) => element.id === id)
 
-        if (cachedLocalEvent) {
-            commit(types.SET_CURRENT_EVENT, {event: cachedLocalEvent})
-            return
-        }
-
-        if (cachedEvent && cachedEvent.status > 1) {
-            commit(types.SET_CURRENT_EVENT, {event: cachedEvent})
-            return
-        }
-
         if (rootState.auth.offline) {
+            const cachedLocalEvent = state.localEvents.find((element) => element.id === id)
+            if (cachedLocalEvent) {
+                commit(types.SET_CURRENT_EVENT, {event: cachedLocalEvent})
+                return
+            }
             if (cachedEvent) {
                 const localEvent = new LocalEvent(cachedEvent)
                 commit(types.ADD_TO_LOCAL_EVENTS, {localEvent: localEvent})
@@ -186,29 +184,31 @@ const actions = {
         } else {
             if (cachedEvent) {
                 commit(types.SET_CURRENT_EVENT, {event: cachedEvent})
+                commit(types.SET_CURRENT_LOADING, {id: cachedEvent.id})
 
                 const remoteEvent = await api.pullEvent(id)
                 remoteEvent.records = await checkApi.getRecords(remoteEvent.id)
-                const compareRecords = (x, y) => {
-                    if (x.length !== y.length) return false
-                    let objectsAreSame = true
-                    for (let propertyName of x) {
-                        if (x[propertyName] !== y[propertyName]) {
-                            objectsAreSame = false
-                            break
+                if (state.currentLoading === cachedEvent.id) {
+                    const compareRecords = (x, y) => {
+                        if (x.length !== y.length) return false
+                        let objectsAreSame = true
+                        for (let propertyName of x) {
+                            if (x[propertyName] !== y[propertyName]) {
+                                objectsAreSame = false
+                                break
+                            }
                         }
+                        return objectsAreSame
                     }
-                    return objectsAreSame
-                }
-
-                if (cachedEvent instanceof LocalEvent ||
-                    cachedEvent.name !== remoteEvent.name ||
-                    cachedEvent.id !== remoteEvent.id ||
-                    cachedEvent.description !== remoteEvent.description ||
-                    cachedEvent.time !== remoteEvent.time ||
-                    !compareRecords(cachedEvent.records, remoteEvent.records)
-                ) {
-                    commit(types.SET_CURRENT_EVENT, {event: remoteEvent})
+                    if (cachedEvent instanceof LocalEvent ||
+                        cachedEvent.name !== remoteEvent.name ||
+                        cachedEvent.id !== remoteEvent.id ||
+                        cachedEvent.description !== remoteEvent.description ||
+                        cachedEvent.time !== remoteEvent.time ||
+                        !compareRecords(cachedEvent.records, remoteEvent.records)
+                    ) {
+                        commit(types.SET_CURRENT_EVENT, {event: remoteEvent})
+                    }
                 }
             } else {
                 const remoteEvent = await api.pullEvent(id)

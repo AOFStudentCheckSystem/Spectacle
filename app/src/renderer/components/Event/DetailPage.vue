@@ -5,7 +5,7 @@
 </style>
 
 <template>
-  <f7-page @page:beforeanimation="pageInit">
+  <f7-page>
     <f7-list form tablet-inset v-show="currentEvent">
       <f7-list-item>
         <f7-label>Name</f7-label>
@@ -19,11 +19,11 @@
       </f7-list-item>
       <f7-list-item>
         <f7-label>Date</f7-label>
-        <f7-input :disabled="disabled" type="text" placeholder="Date" id="event-detail-date-picker"></f7-input>
+        <f7-input ref="calendar" :disabled="disabled" type="text" :value="displayedDate" placeholder="Date" id="event-detail-date-picker"></f7-input>
       </f7-list-item>
       <f7-list-item>
         <f7-label>Time</f7-label>
-        <f7-input :disabled="disabled" type="text" placeholder="Time" id="event-detail-time-picker"></f7-input>
+        <f7-input ref="picker" :disabled="disabled" type="text" :value="displayedTime" placeholder="Time" id="event-detail-time-picker"></f7-input>
       </f7-list-item>
     </f7-list>
     <div v-show="!currentEvent">
@@ -49,7 +49,7 @@
                 calendar: null,
                 calendarValue: {
                     year: 2000,
-                    month: 1,
+                    month: 0,
                     date: 1
                 },
                 name: '',
@@ -66,11 +66,25 @@
             ]),
             disabled () {
                 return this.currentEvent ? this.currentEvent.status > 1 : true
+            },
+            displayedDate () {
+                if (this.calendar) {
+                    return this.calendar.displayValue[0] + ' ' + this.calendar.value[1] + ', ' + this.calendar.value[2]
+                } else {
+                    return ''
+                }
+            },
+            displayedTime () {
+                if (this.picker) {
+                    return this.picker.displayValue[0] + ':' + this.picker.value[1]
+                } else {
+                    return ''
+                }
             }
         },
         methods: {
             buildPickers (date) {
-                this.destroyPickers()
+//                this.destroyPickers()
                 const self = this
                 if (!this.picker) {
                     this.picker = this.$f7.picker(PickerUtil.timePicker('#event-detail-time-picker',
@@ -102,6 +116,8 @@
                             }
                         }, date))
                 }
+                this.picker.setValue([self.pickerValue.hour, self.pickerValue.minute], 1000)
+                this.calendar.setValue([self.calendarValue.month, self.calendarValue.date, self.calendarValue.year], 1000)
             },
             destroyPickers () {
                 this.calendar ? this.calendar.destroy() : undefined
@@ -130,17 +146,19 @@
                 }
             },
             editTime (event) {
-                if (event.status < 2) {
-                    this.$store.dispatch('patchEvent', {
-                        event,
-                        patch: {
-                            time: new Date(this.calendarValue.year,
-                                this.calendarValue.month,
-                                this.calendarValue.date,
-                                this.pickerValue.hour,
-                                this.pickerValue.minute).getTime()
-                        }
-                    })
+                if (event) {
+                    if (event.status < 2) {
+                        this.$store.dispatch('patchEvent', {
+                            event,
+                            patch: {
+                                time: new Date(this.calendarValue.year,
+                                    this.calendarValue.month,
+                                    this.calendarValue.date,
+                                    this.pickerValue.hour,
+                                    this.pickerValue.minute).getTime()
+                            }
+                        })
+                    }
                 }
             },
             pageInit () {
@@ -175,6 +193,11 @@
         },
         beforeDestroy () {
             this.destroyPickers()
+        },
+        mounted () {
+            this.$nextTick(() => {
+                this.pageInit()
+            })
         }
     }
 </script>
