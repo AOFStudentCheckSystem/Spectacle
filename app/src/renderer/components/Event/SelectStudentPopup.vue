@@ -88,6 +88,7 @@
                     this.$refs['popup'].close()
                     this.selected = null
                     this.$refs['searchbar'].empty()
+                    this.$refs['searchbar'].disable()
                 } else {
                     this.cancelClicked()
                 }
@@ -97,6 +98,7 @@
                     student: null
                 })
                 this.$refs['searchbar'].empty()
+                this.$refs['searchbar'].disable()
                 this.selected = null
             }
         },

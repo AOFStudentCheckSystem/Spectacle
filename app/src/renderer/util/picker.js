@@ -9,7 +9,7 @@ export const datePicker = (element, container, changeCallback, dateObj) => {
         toolbar: false,
         rotateEffect: true,
 
-        value: [String(today.getMonth()), today.getDate(), today.getFullYear()],
+        value: [today.getMonth(), today.getDate(), today.getFullYear()],
 
         onChange: function (picker, values, displayValues) {
             let daysInMonth = new Date(picker.value[2], picker.value[0] + 1, 0).getDate()

@@ -2,11 +2,14 @@
 * Created by dummy on 4/13/17.
 */
 <style scoped>
-
+  .hide-overflow {
+    overflow: hidden;
+  }
 </style>
 
 <template>
-  <f7-views tabs toolbar-through>
+  <f7-views tabs toolbar-through class="hide-overflow">
+    <status-bar></status-bar>
     <left-view id="left-view"></left-view>
     <event-view id="event-view"></event-view>
     <subject-view id="subject-view"></subject-view>
@@ -30,9 +33,10 @@
     import {EventBusMixin} from '../../mixins/event-bus'
     import CreatePopup from '../Event/CreatePopup.vue'
     import SelectStudentPopup from '../Event/SelectStudentPopup.vue'
+    import StatusBar from './StatusBar.vue'
 
     export default {
-        components: {LeftView, EventView, SubjectView, PreferenceView, CreatePopup, SelectStudentPopup},
+        components: {LeftView, EventView, SubjectView, PreferenceView, CreatePopup, SelectStudentPopup, StatusBar},
         mixins: [EventBusMixin],
         data () {
             return {

@@ -19,6 +19,7 @@ import Framework7ThemeColors from 'framework7/dist/css/framework7.ios.colors.min
  import Framework7ThemeColors from 'framework7/dist/css/framework7.material.colors.min.css'
  */
 import './css/app.css'
+import 'font-awesome/css/font-awesome.css'
 import 'framework7-icons/css/framework7-icons.css'
 import routerOptions from './routes'
 import axios from 'axios'

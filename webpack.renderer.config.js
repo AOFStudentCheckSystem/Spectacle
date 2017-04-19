@@ -33,7 +33,7 @@ let rendererConfig = {
             {
                 test: /\.js$/,
                 use: 'babel-loader',
-                include: [path.resolve(__dirname, 'app/src/renderer')],
+                include: [path.resolve(__dirname, 'app/src/renderer'), path.resolve(__dirname, 'app/src/smartcard')],
                 exclude: /node_modules/
             },
             {

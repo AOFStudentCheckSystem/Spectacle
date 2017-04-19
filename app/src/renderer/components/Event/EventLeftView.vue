@@ -44,6 +44,14 @@
 
 <template>
   <f7-page pull-to-refresh @ptr:refresh="onRefresh">
+    <f7-navbar title="Event">
+      <f7-nav-right>
+        <!-- Add new VL item on click -->
+        <f7-link @click="addNewItem">
+          <f7-icon f7="add"></f7-icon>
+        </f7-link>
+      </f7-nav-right>
+    </f7-navbar>
     <!--
       Searchbar to search thorugh VL Items
       List to search specified in "search-list" prop

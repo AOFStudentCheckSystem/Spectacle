@@ -126,7 +126,7 @@ const getters = {
     },
     sortedCurrentEventRecords (state, getters) {
         return getters.currentEventRecords.concat().sort((a, b) => {
-            return Math.abs(a.checkInTime) - Math.abs(b.checkInTime)
+            return Math.abs(b.checkInTime) - Math.abs(a.checkInTime)
         })
     }
 }

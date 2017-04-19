@@ -100,6 +100,7 @@ const actions = {
             }
             if (!state.offline) {
                 commit(types.SET_OFFLINE, {offline: true})
+                commit(types.SET_ONLINE, {online: false})
                 commit(types.CLEAR_CONSISTENCY)
             }
         }

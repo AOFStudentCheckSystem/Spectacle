@@ -38,7 +38,7 @@
     </f7-list>
     <div v-else>
       <f7-block-title>To start using this app</f7-block-title>
-      <f7-block>Select a subject from the list on the left</f7-block>
+      <f7-block>Select a subject from the list</f7-block>
     </div>
   </f7-page>
 </template>

@@ -8,7 +8,13 @@
 <template>
   <f7-page name="event-check" @page:init="setPageActive(true)"
            @page:reinit="setPageActive(true)" @page:beforeremove="setPageActive(false)">
-    <f7-navbar :title="computedTitle" back-link="Back" sliding></f7-navbar>
+    <f7-navbar :title="computedTitle" back-link="Back" sliding>
+      <f7-nav-right>
+        <f7-link @click="stupidKidForgotHisCard">
+          <f7-icon f7="add_round"></f7-icon>
+        </f7-link>
+      </f7-nav-right>
+    </f7-navbar>
 
     <f7-searchbar cancel-link="Cancel"
                   :params="{ searchList: '#check-list',
@@ -89,6 +95,7 @@
                             checkInTime: -(new Date().getTime())
                         })
                     })
+                    this.$forceUpdate()
                 }
             },
             addSwiped (student) {
@@ -100,6 +107,7 @@
                             checkInTime: new Date().getTime()
                         })
                     })
+                    this.$forceUpdate()
                 }
             },
             addRecord (cardSecret) {
@@ -115,6 +123,7 @@
                                 checkInTime: new Date().getTime()
                             })
                         })
+                        this.$forceUpdate()
                     } else {
                         if (!this.subscription) {
                             this.$publish(this.$channels.SELECT_STUDENT_POPUP)
@@ -123,19 +132,42 @@
                                 self.$unsubscribe(self.subscription)
                                 self.subscription = null
                                 if (student) {
-                                    this.$store.dispatch('addEventRecord', {
+                                    self.$store.dispatch('addEventRecord', {
                                         record: new ActivityEventRecord({
                                             student: student,
                                             signUpTime: -1,
                                             checkInTime: new Date().getTime()
                                         })
                                     })
-                                    this.$store.dispatch('patchStudentCardSecret', {
+                                    self.$store.dispatch('patchStudentCardSecret', {
                                         student, cardSecret
                                     })
+                                    self.$forceUpdate()
                                 }
                             })
                         }
+                    }
+                }
+            },
+            stupidKidForgotHisCard () {
+                if (this.checkable) {
+                    if (!this.subscription) {
+                        this.$publish(this.$channels.SELECT_STUDENT_POPUP)
+                        const self = this
+                        this.subscription = this.$subscribe(this.$channels.SELECTED_STUDENT, ({student}) => {
+                            self.$unsubscribe(self.subscription)
+                            self.subscription = null
+                            if (student) {
+                                self.$store.dispatch('addEventRecord', {
+                                    record: new ActivityEventRecord({
+                                        student: student,
+                                        signUpTime: -1,
+                                        checkInTime: new Date().getTime()
+                                    })
+                                })
+                                self.$forceUpdate()
+                            }
+                        })
                     }
                 }
             }

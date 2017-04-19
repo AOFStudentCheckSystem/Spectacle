@@ -37,6 +37,12 @@
 
 <template>
   <f7-page pull-to-refresh @ptr:refresh="onRefresh">
+    <f7-navbar>
+      <!--<f7-nav-left v-if="currentEvent">-->
+      <!--<f7-link href="/event/edit/">Edit</f7-link>-->
+      <!--</f7-nav-left>-->
+      <f7-nav-center>Student</f7-nav-center>
+    </f7-navbar>
     <!--
       Searchbar to search thorugh VL Items
       List to search specified in "search-list" prop

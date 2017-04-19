@@ -81,9 +81,9 @@
                     this.calendar = this.$f7.picker(PickerUtil.datePicker('#event-date-picker',
                         '#event-date-picker-container',
                         (picker, values, displayValues) => {
-                            self.calendarValue.month = values[0]
-                            self.calendarValue.date = values[1]
-                            self.calendarValue.year = values[2]
+                            self.calendarValue.month = Number(values[0])
+                            self.calendarValue.date = Number(values[1])
+                            self.calendarValue.year = Number(values[2])
                         }))
                 }
             },
