@@ -89,7 +89,7 @@ let rendererConfig = {
         }),
         new webpack.NoEmitOnErrorsPlugin(),
         new webpack.DefinePlugin({
-            'process.env.SERVER_URL': '"https://check.guardiantech.com.cn/"'
+            'process.env.SERVER_URL': '"https://api.aofactivities.com/"'
         })
     ],
     output: {
