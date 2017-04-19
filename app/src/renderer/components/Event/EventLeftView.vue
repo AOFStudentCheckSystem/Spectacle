@@ -64,7 +64,7 @@
     >
       <f7-list-item media-item
                     v-for="e in mergedEvents" :title="e.name"
-                    :subtitle="e.description || 'Empty Description'"
+                    :subtitle="e.description || formatTime(e.time)"
                     :badge="e.status === 0 ? 'Future' : e.status === 1 ? 'Boarding' : 'Complete'"
                     :badge-color="e.status === 0 ? 'blue' : e.status === 1 ? 'red' : 'green'"
                     @click="onClick(e.id)"
@@ -80,6 +80,7 @@
     import {mapActions, mapGetters} from 'vuex'
     import {ActivityEvent, LocalEvent} from '../../models/event'
     import {EventBusMixin} from '../../mixins/event-bus'
+    import moment from 'moment'
     //    import CreatePopup from './CreatePopup.vue'
 
     export default {
@@ -120,6 +121,9 @@
                     'sync': (event instanceof ActivityEvent),
                     'local': event instanceof LocalEvent && event.hasRemote
                 }
+            },
+            formatTime (time) {
+                return moment(time).format('ddd, MMM Mo YYYY HH:mm')
             }
         },
         computed: {
