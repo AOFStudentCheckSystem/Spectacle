@@ -41,7 +41,7 @@
       <!--<f7-nav-left v-if="currentEvent">-->
       <!--<f7-link href="/event/edit/">Edit</f7-link>-->
       <!--</f7-nav-left>-->
-      <f7-nav-center>Student</f7-nav-center>
+      <f7-nav-center>Subject</f7-nav-center>
     </f7-navbar>
     <!--
       Searchbar to search thorugh VL Items
@@ -59,21 +59,23 @@
       <f7-list-item title="Nothing found"></f7-list-item>
     </f7-list>
 
-    <!-- Search through this list -->
-    <f7-list
-            id="student-list"
-            class="student-searchbar-found searchbar-found"
-            media-list
-    >
-      <f7-list-item media-item
-                    v-for="e in students" :title="e.lastName + ', ' + e.firstName"
-                    :subtitle="e.preferredName || e.firstName"
-                    @click="onClick(e.idNumber)"
-                    class="item-link"
-                    :class="classObjForStudent(e)"
-      >
-      </f7-list-item>
-    </f7-list>
+    <virtual-scroller id="student-list" containerTag="ul" mainTag="div" :class="['list-block', 'media-list', 'student-searchbar-found']"
+                      :items="students" :itemHeight="63" keyField="idNumber">
+      <template scope="props">
+        <li class="item-content media-item item-link"
+            @click="onClick(props.item.idNumber)"
+            :key="props.itemKey"
+            :class="classObjForStudent(props.item)">
+          <div class="item-inner">
+            <div class="item-title-row">
+              <div class="item-title">{{props.item.lastName + ', ' + props.item.firstName}}</div>
+            </div>
+            <div class="item-subtitle">{{props.item.preferredName || props.item.firstName}}</div>
+          </div>
+        </li>
+      </template>
+    </virtual-scroller>
+    
   </f7-page>
 </template>
 

@@ -24,10 +24,17 @@ import 'framework7-icons/css/framework7-icons.css'
 import routerOptions from './routes'
 import axios from 'axios'
 import {ConnectionWatcher} from './watcher/connection'
+import VueVirtualScroller from 'vue-virtual-scroller/dist/vue-virtual-scroller'
+
+const webFrame = require('electron').webFrame
+webFrame.setVisualZoomLevelLimits(1, 1)
+webFrame.setLayoutZoomLevelLimits(0, 0)
 
 Vue.use(Electron)
 
 Vue.use(Framework7Vue)
+
+Vue.use(VueVirtualScroller)
 
 function str2ab (str) {
     let buf = new ArrayBuffer(str.length * 2) // 2 bytes for each char

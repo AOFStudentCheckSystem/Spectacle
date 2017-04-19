@@ -35,7 +35,7 @@
   }
 
   /*.remove-list-margin {*/
-    /*margin: 0 !important;*/
+  /*margin: 0 !important;*/
   /*}*/
 </style>
 
@@ -65,22 +65,41 @@
     </f7-list>
 
     <!-- Search through this list -->
-    <f7-list
-            id="search-list"
-            class="searchbar-found remove-list-margin"
-            media-list
-    >
-      <f7-list-item media-item
-                    v-for="e in mergedEvents" :title="e.name"
-                    :subtitle="e.description || formatTime(e.time)"
-                    :badge="e.status === 0 ? 'Future' : e.status === 1 ? 'Boarding' : 'Complete'"
-                    :badge-color="e.status === 0 ? 'blue' : e.status === 1 ? 'red' : 'green'"
-                    @click="onClick(e.id)"
-                    class="item-link"
-                    :class="classObjForEvent(e)"
-      >
-      </f7-list-item>
-    </f7-list>
+    <!--<f7-list-->
+            <!--id="search-list"-->
+            <!--class="searchbar-found remove-list-margin"-->
+            <!--media-list-->
+    <!--&gt;-->
+      <!--<f7-list-item-->
+              <!--:badge="e.status === 0 ? 'Future' : e.status === 1 ? 'Boarding' : 'Complete'"-->
+              <!--:badge-color="e.status === 0 ? 'blue' : e.status === 1 ? 'red' : 'green'"-->
+              <!--@click="onClick(e.id)"-->
+              <!--class="item-link"-->
+              <!--:class="classObjForEvent(e)"-->
+      <!--&gt;-->
+      <!--</f7-list-item>-->
+    <!--</f7-list>-->
+    <virtual-scroller id="search-list" containerTag="ul" mainTag="div"
+                      :class="['list-block', 'media-list', 'searchbar-found']"
+                      :items="mergedEvents" :itemHeight="63" keyField="id">
+      <template scope="props">
+        <li class="item-link" @click="onClick(props.item.id)" :class="classObjForEvent(props.item)"
+            :key="props.itemKey">
+          <div class="item-content">
+            <div class="item-inner">
+              <div class="item-title-row">
+                <div class="item-title">{{props.item.name}}</div>
+                <div class="item-after"><span class="badge"
+                                              :class="props.item.status == 0 ? 'color-blue' : props.item.status === 1 ? 'color-red' : 'color-green'">
+                  {{props.item.status == 0 ? 'Future' : props.item.status === 1 ? 'Boarding' : 'Complete'}}</span>
+                </div>
+              </div>
+              <div class="item-subtitle">{{props.item.description || formatTime(props.item.time)}}</div>
+            </div>
+          </div>
+        </li>
+      </template>
+    </virtual-scroller>
   </f7-page>
 </template>
 

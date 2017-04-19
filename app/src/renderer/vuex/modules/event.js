@@ -177,9 +177,13 @@ const actions = {
                 return
             }
             if (cachedEvent) {
-                const localEvent = new LocalEvent(cachedEvent)
-                commit(types.ADD_TO_LOCAL_EVENTS, {localEvent: localEvent})
-                commit(types.SET_CURRENT_EVENT, {event: localEvent})
+                if (cachedEvent.status < 2) {
+                    const localEvent = new LocalEvent(cachedEvent)
+                    commit(types.ADD_TO_LOCAL_EVENTS, {localEvent: localEvent})
+                    commit(types.SET_CURRENT_EVENT, {event: localEvent})
+                } else {
+                    commit(types.SET_CURRENT_EVENT, {event: cachedEvent})
+                }
             }
         } else {
             if (cachedEvent) {
@@ -292,11 +296,11 @@ const actions = {
                 const localEvent = new LocalEvent(event)
                 commit(types.ADD_TO_LOCAL_EVENTS, {localEvent: localEvent})
                 commit(types.PATCH_EVENT, {event: localEvent, patch})
-                return
+            } else {
+                commit(types.APPEND_BROKEN_EVENT, {broken: {patch: patch, event: event}})
+                commit(types.PATCH_EVENT, {event, patch: previousState})
+                console.error(e)
             }
-            commit(types.APPEND_BROKEN_EVENT, {broken: {patch: patch, event: event}})
-            commit(types.PATCH_EVENT, {event, patch: previousState})
-            console.error(e)
         }
     },
     async addEventRecord ({commit, state, rootState}, {record}) {
@@ -352,9 +356,9 @@ const actions = {
                             continue
                         }
                         if (element.status > 1 && element.hasRemote) {
-                            commit(types.APPEND_BROKEN_EVENT, {broken: element})
+                            // commit(types.APPEND_BROKEN_EVENT, {broken: element})
+                            // console.error('edited or checked in for completed event')
                             toRemove.push(element)
-                            console.error('edited or checked in for completed event')
                             continue
                         }
                         element.id = eventId

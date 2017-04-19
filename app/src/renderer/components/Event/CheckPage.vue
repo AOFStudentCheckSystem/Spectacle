@@ -28,27 +28,38 @@
       <f7-list-item title="Nothing found"></f7-list-item>
     </f7-list>
 
-    <!-- Search through this list -->
-    <f7-list
-            id="check-list"
-            class="check-searchbar-found remove-list-margin"
-            media-list tablet-inset
-    >
-      <f7-list-item media-item
-                    v-for="e in sortedCurrentEventRecords" :title="e.student.lastName + ', ' + e.student.firstName"
-                    :subtitle="e.student.preferredName || e.student.firstName"
-                    :badge="e.checkInTime >= 0 ? 'Checked' : 'Removed'"
-                    :badge-color="e.checkInTime >= 0 ? 'blue' : 'red'"
-                    swipeout
-      >
-        <f7-swipeout-actions right v-if="e.checkInTime >= 0">
-          <f7-swipeout-button close overswipe color="red" @click="removeSwiped(e.student)">Remove</f7-swipeout-button>
-        </f7-swipeout-actions>
-        <f7-swipeout-actions left v-if="e.checkInTime < 0">
-          <f7-swipeout-button close overswipe color="blue" @click="addSwiped(e.student)">Add</f7-swipeout-button>
-        </f7-swipeout-actions>
-      </f7-list-item>
-    </f7-list>
+    <virtual-scroller id="check-list" containerTag="ul" mainTag="div" :class="['list-block', 'media-list', 'check-searchbar-found', 'tablet-inset']"
+                      :items="sortedCurrentEventRecords" :itemHeight="63" keyField="id">
+      <template scope="props">
+        <li class="swipeout"
+            :key="props.itemKey">
+          <div class="swipeout-content">
+            <div class="item-content">
+              <div class="item-inner">
+                <div class="item-title-row">
+                  <div class="item-title">{{props.item.student.lastName + ', ' + props.item.student.firstName}}</div>
+                  <div class="item-after"><span class="badge" :class="props.item.checkInTime >= 0 ? 'color-blue' : 'color-red'">{{props.item.checkInTime >= 0 ? 'Checked' : 'Removed'}}</span></div>
+                </div>
+                <div class="item-subtitle">{{props.item.student.preferredName || props.item.student.firstName}}</div>
+              </div>
+            </div>
+          </div>
+          <!--<div class="swipeout-actions-left" v-if="props.item.checkInTime < 0">-->
+            <!--<a class="swipeout-close swipeout-overswipe bg-blue" href="#">Add</a>-->
+          <!--</div>-->
+          <!--<div class="swipeout-actions-right" v-if="props.item.checkInTime >= 0">-->
+            <!--<a class="swipeout-close swipeout-overswipe bg-red" href="#">Remove</a>-->
+          <!--</div>-->
+          <f7-swipeout-actions right v-if="props.item.checkInTime >= 0">
+            <f7-swipeout-button close overswipe color="red" @click="removeSwiped(props.item.student)">Remove</f7-swipeout-button>
+          </f7-swipeout-actions>
+          <f7-swipeout-actions left v-if="props.item.checkInTime < 0">
+            <f7-swipeout-button close overswipe color="blue" @click="addSwiped(props.item.student)">Add</f7-swipeout-button>
+          </f7-swipeout-actions>
+        </li>
+      </template>
+    </virtual-scroller>
+
   </f7-page>
 </template>
 

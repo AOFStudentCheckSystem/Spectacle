@@ -19,11 +19,13 @@
       </f7-list-item>
       <f7-list-item>
         <f7-label>Date</f7-label>
-        <f7-input ref="calendar" :disabled="disabled" type="text" :value="displayedDate" placeholder="Date" id="event-detail-date-picker"></f7-input>
+        <f7-input ref="calendar" :disabled="disabled" type="text" placeholder="Date" :value="displayedDate"
+                  id="event-detail-date-picker"></f7-input>
       </f7-list-item>
       <f7-list-item>
         <f7-label>Time</f7-label>
-        <f7-input ref="picker" :disabled="disabled" type="text" :value="displayedTime" placeholder="Time" id="event-detail-time-picker"></f7-input>
+        <f7-input ref="picker" :disabled="disabled" type="text" placeholder="Time" :value="displayedTime"
+                  id="event-detail-time-picker"></f7-input>
       </f7-list-item>
     </f7-list>
     <div v-show="!currentEvent">
@@ -69,14 +71,14 @@
             },
             displayedDate () {
                 if (this.calendar) {
-                    return this.calendar.displayValue[0] + ' ' + this.calendar.value[1] + ', ' + this.calendar.value[2]
+                    return PickerUtil.monthMap[this.calendarValue.month] + ' ' + this.calendarValue.date + ', ' + this.calendarValue.year
                 } else {
                     return ''
                 }
             },
             displayedTime () {
                 if (this.picker) {
-                    return this.picker.displayValue[0] + ':' + this.picker.value[1]
+                    return this.pickerValue.hour + ':' + (this.pickerValue.minute < 10 ? ('0' + this.pickerValue.minute) : this.pickerValue.minute)
                 } else {
                     return ''
                 }
@@ -116,7 +118,7 @@
                             }
                         }, date))
                 }
-                this.picker.setValue([self.pickerValue.hour, self.pickerValue.minute], 1000)
+                this.picker.setValue([self.pickerValue.hour, self.pickerValue.minute < 10 ? ('0' + self.pickerValue.minute) : self.pickerValue.minute], 1000)
                 this.calendar.setValue([self.calendarValue.month, self.calendarValue.date, self.calendarValue.year], 1000)
             },
             destroyPickers () {
@@ -193,11 +195,6 @@
         },
         beforeDestroy () {
             this.destroyPickers()
-        },
-        mounted () {
-            this.$nextTick(() => {
-                this.pageInit()
-            })
         }
     }
 </script>

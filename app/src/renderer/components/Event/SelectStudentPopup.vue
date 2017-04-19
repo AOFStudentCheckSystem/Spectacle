@@ -37,19 +37,36 @@
           </f7-list>
 
           <!-- Search through this list -->
-          <f7-list
-                  id="empty-card-list"
-                  class="empty-card-searchbar-found remove-list-margin"
-                  media-list
-          >
-            <f7-list-item media-item tablet-inset
-                            v-for="e in students" :title="e.lastName + ', ' + e.firstName"
-                            :subtitle="e.idNumber"
-                            @click="onClick(e)"
-                            :class="computedClass(e)"
-            >
-            </f7-list-item>
-          </f7-list>
+          <!--<f7-list-->
+                  <!--id="empty-card-list"-->
+                  <!--class="empty-card-searchbar-found remove-list-margin"-->
+                  <!--media-list tablet-inset-->
+          <!--&gt;-->
+            <!--<f7-list-item media-item-->
+                          <!--v-for="e in students" :title="e.lastName + ', ' + e.firstName"-->
+                          <!--:subtitle="e.idNumber"-->
+                          <!--@click="onClick(e)"-->
+                          <!--:class="computedClass(e)"-->
+            <!--&gt;-->
+            <!--</f7-list-item>-->
+          <!--</f7-list>-->
+
+          <virtual-scroller id="empty-card-list" containerTag="ul" mainTag="div" :class="['list-block', 'media-list', 'empty-card-searchbar-found', 'tablet-inset']"
+                            :items="students" :itemHeight="63" keyField="idNumber">
+            <template scope="props">
+              <li class="item-content media-item"
+                  @click="onClick(props.item)"
+                  :key="props.itemKey"
+                  :class="computedClass(props.item)">
+                <div class="item-inner">
+                  <div class="item-title-row">
+                    <div class="item-title">{{props.item.lastName + ', ' + props.item.firstName}}</div>
+                  </div>
+                  <div class="item-subtitle">{{props.item.preferredName || props.item.firstName}}</div>
+                </div>
+              </li>
+            </template>
+          </virtual-scroller>
         </f7-page>
       </f7-pages>
     </f7-view>
