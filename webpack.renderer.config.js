@@ -33,7 +33,7 @@ let rendererConfig = {
             {
                 test: /\.js$/,
                 use: 'babel-loader',
-                include: [path.resolve(__dirname, 'app/src/renderer')],
+                include: [path.resolve(__dirname, 'app/src/renderer'), path.resolve(__dirname, 'app/src/smartcard')],
                 exclude: /node_modules/
             },
             {
@@ -89,7 +89,7 @@ let rendererConfig = {
         }),
         new webpack.NoEmitOnErrorsPlugin(),
         new webpack.DefinePlugin({
-            'process.env.SERVER_URL': '"https://check.guardiantech.com.cn/"'
+            'process.env.SERVER_URL': '"https://api.aofactivities.com/"'
         })
     ],
     output: {
