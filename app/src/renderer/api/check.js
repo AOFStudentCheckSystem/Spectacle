@@ -15,7 +15,7 @@ export default {
             recordsToUpload: records.map((recordObj) => {
                 return {
                     studentId: recordObj.student.idNumber,
-                    timestamp: recordObj.timestamp
+                    timestamp: recordObj.checkInTime
                 }
             })
         })).data

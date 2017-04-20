@@ -19,10 +19,10 @@ export default {
             studentId: student.idNumber
         })).data)
     },
-    async bindCardWithStudent (student) {
+    async bindCardWithStudent (student, cardSecret) {
         return new ActionResult((await http.post('student/edit/bind-card', {
             studentId: student.idNumber,
-            cardSecret: student.cardSecret
+            cardSecret: cardSecret
         })).data)
     },
     async pullStudent (id) {

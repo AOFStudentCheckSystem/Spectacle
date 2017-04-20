@@ -12,13 +12,14 @@ function createWindow () {
      * Initial window options
      */
     mainWindow = new BrowserWindow({
-        height: 600,
-        width: 800,
+        // height: 600,
+        // width: 800,
         webPreferences: {
             scrollBounce: true
         },
         frame: false,
-        title: 'Spectacle'
+        title: 'Spectacle',
+        fullscreen: process.env.NODE_ENV !== 'development'
     })
 
     mainWindow.loadURL(winURL)

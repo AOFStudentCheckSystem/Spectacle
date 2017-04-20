@@ -50,6 +50,7 @@
                 }).then(() => {
                     self.$f7.hideIndicator()
                     self.close()
+                    self.secret = ''
                 }).catch((e) => {
                     self.$f7.hideIndicator()
                     self.$f7.alert(e, 'Error', () => {
