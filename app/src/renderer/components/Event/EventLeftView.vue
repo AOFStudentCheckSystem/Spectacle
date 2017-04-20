@@ -61,7 +61,7 @@
                   <!--@searchbar:search="onSearch"></f7-searchbar>-->
 
     <!-- Search Bar overlay-->
-    <search-bar v-model="filter" @input="$refs['virtualscroller'].updateVisibleItems()" @overlayActive="overlayActive = $event"></search-bar>
+    <search-bar v-model="filter" @refresh="$refs['virtualscroller'].updateVisibleItems()" @overlayActive="overlayActive = $event"></search-bar>
     <search-bar-overlay :active="overlayActive"></search-bar-overlay>
 
     <!-- This block will become visible when there is nothing found -->
@@ -133,13 +133,14 @@
                 this.$publish(this.$channels.OPEN_EVENT_POPUP)
             },
             ...mapActions([
-                'refreshEvents'
+                'refreshEvents',
+                'syncLocalEvents'
             ]),
             async pullCurrentEvent (id) {
                 await this.$store.dispatch('pullCurrentEvent', {id})
             },
             onRefresh (event, done) {
-                this.refreshEvents().then(() => {
+                this.syncLocalEvents().then(() => {
                     done()
                     this.$forceUpdate()
                 }).catch((e) => {

@@ -41,6 +41,12 @@ export default {
             time: localEvent.time,
             description: localEvent.description
         })).data)
+    },
+    async sendMail (eventId, emailAddress) {
+        return new ActionResult((await http.post('event/sendmail', {
+            eventId: eventId,
+            address: emailAddress
+        })).data)
     }
     // @RequestParam("eventId") eventID: String,
     // @RequestParam("newTime", required = false, defaultValue = "0") newTime: Long,

@@ -6,7 +6,7 @@
 </style>
 
 <template>
-    <f7-view class="view-main" navbar-through tab active :dynamic-navbar="true" main ref="view" @tab:show="setSidePanel">
+    <f7-view class="view-main" navbar-through tab active :dynamic-navbar="true" main ref="view" @tab:show="onTabShown" @tab:hide="onTabHidden">
         <f7-navbar sliding>
             <!--<f7-nav-left v-if="currentEvent">-->
             <!--<f7-link href="/event/edit/">Edit</f7-link>-->
@@ -53,6 +53,9 @@
             ])
         },
         methods: {
+            onTabHidden () {
+                this.$publish(this.$channels.EVENT_TAB_SHOW, {status: false})
+            },
             routeTo (route, sidePanel) {
                 this.routeSidePanel(sidePanel)
                 this.router.load({url: route})
@@ -68,16 +71,23 @@
                     this.$publish(this.$channels.LEFT_VIEW_ENABLE, false)
                 }
             },
-            setSidePanel () {
+            onTabShown () {
+                this.$publish(this.$channels.EVENT_TAB_SHOW, {status: true})
                 this.routeSidePanel('/left/event/')
             },
             completeEvent () {
-                this.$store.dispatch('patchEvent', {
-                    event: this.currentEvent,
-                    patch: {
-                        status: 2
-                    }
-                })
+                const self = this
+                const currentEvent = self.currentEvent
+                if (currentEvent) {
+                    this.$f7.confirm('You may not modify the even once it has been completed.', `Mark event "${currentEvent.name}" as complete?`, function () {
+                        self.$store.dispatch('patchEvent', {
+                            event: currentEvent,
+                            patch: {
+                                status: 2
+                            }
+                        })
+                    })
+                }
             }
         },
         watch: {

@@ -6,7 +6,7 @@
 
 <template>
   <f7-page>
-    <f7-list form tablet-inset v-show="currentEvent">
+    <f7-list tablet-inset v-show="currentEvent">
       <f7-list-item>
         <f7-label>Name</f7-label>
         <f7-input :disabled="disabled" v-model="name" type="textarea" placeholder="Name"
@@ -28,6 +28,13 @@
                   id="event-detail-time-picker"></f7-input>
       </f7-list-item>
     </f7-list>
+    <f7-list tablet-inset v-show="emailEnabled">
+      <f7-list-item>
+        <f7-label>Email</f7-label>
+        <f7-input v-model="emailAddress" type="text" placeholder="Address"></f7-input>
+      </f7-list-item>
+      <f7-list-button :disabled="sendButtonDisabled" @click="onEmailSend" title="Send"></f7-list-button>
+    </f7-list>
     <div v-show="!currentEvent">
       <f7-block-title>To start using this app</f7-block-title>
       <f7-block>Select an event from the list</f7-block>
@@ -36,9 +43,10 @@
 </template>
 
 <script>
-    import {mapGetters} from 'vuex'
+    import {mapActions, mapGetters} from 'vuex'
     import * as PickerUtil from '../../util/picker'
     import {debounce} from '../../util/suppress'
+    import {ActivityEvent} from '../../models/event'
 
     export default {
         data () {
@@ -58,13 +66,15 @@
                 description: '',
                 throttledEditName: debounce(this.editName, 500), // throttle(this.editName, 5000),
                 throttledEditDescription: debounce(this.editDescription, 500), // throttle(this.editDescription, 5000),
-                throttledEditTime: debounce(this.editTime, 500) // throttle(this.editTime, 5000)
+                throttledEditTime: debounce(this.editTime, 500), // throttle(this.editTime, 5000),
+                emailAddress: ''
             }
         },
         computed: {
             ...mapGetters([
                 'currentEvent',
-                'currentEventRecords'
+                'currentEventRecords',
+                'isAdmin'
             ]),
             disabled () {
                 return this.currentEvent ? this.currentEvent.status > 1 : true
@@ -82,9 +92,38 @@
                 } else {
                     return ''
                 }
+            },
+            emailEnabled () {
+                return this.currentEvent && this.currentEvent instanceof ActivityEvent && (this.currentEvent.status > 1 || this.isAdmin)
+            },
+            sendButtonDisabled () {
+                return !this.emailAddress.match(/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/)
             }
         },
         methods: {
+            ...mapActions([
+                'emailEvent'
+            ]),
+            onEmailSend () {
+                if (this.emailAddress && this.currentEvent) {
+                    const currentEvent = this.currentEvent
+                    const emailAddress = this.emailAddress
+                    const self = this
+                    self.$f7.showIndicator()
+                    this.emailEvent({
+                        event: currentEvent,
+                        email: emailAddress
+                    }).then(() => {
+                        self.emailAddress = ''
+                        self.$f7.hideIndicator()
+                        self.$f7.alert('The email has been sent.', 'Spectacular!')
+                    }).catch((error) => {
+                        self.emailAddress = ''
+                        self.$f7.hideIndicator()
+                        self.$f7.alert(error, 'Error')
+                    })
+                }
+            },
             buildPickers (date) {
 //                this.destroyPickers()
                 const self = this

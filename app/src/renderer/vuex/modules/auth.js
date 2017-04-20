@@ -47,13 +47,24 @@ const getters = {
     },
     online (state) {
         return state.online
+    },
+    isAdmin (state) {
+        return state.token ? state.token.user.isAuthorized(1000) : false
+    },
+    isTablet (state) {
+        return state.token ? state.token.user.isAuthorized(900) : false
     }
 }
 
 const actions = {
     async authenticate ({commit}, {email, password}) {
         commit(types.SET_SIGNING_IN, {signingIn: true})
-        commit(types.SET_USER_TOKEN, {token: await api.authenticate(email, password)})
+        const userToken = await api.authenticate(email, password)
+        if (userToken.user.isAuthorized(900)) {
+            commit(types.SET_USER_TOKEN, {token: userToken})
+        } else {
+            throw new Error('Unauthorized')
+        }
         window.setTimeout(() => {
             commit(types.SET_SIGNING_IN, {signingIn: false})
         }, 10000)

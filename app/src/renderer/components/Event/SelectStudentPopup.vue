@@ -24,7 +24,7 @@
       </f7-navbar>
       <f7-pages>
         <f7-page>
-          <search-bar v-model="filter" @input="$refs['virtualscroller'].updateVisibleItems()" @overlayActive="overlayActive = $event"></search-bar>
+          <search-bar v-model="filter" @refresh="$refs['virtualscroller'].updateVisibleItems()" @overlayActive="overlayActive = $event"></search-bar>
           <search-bar-overlay :active="overlayActive"></search-bar-overlay>
 
           <!-- This block will become visible when there is nothing found -->
@@ -90,6 +90,7 @@
                     })
                     this.$refs['popup'].close()
                     this.selected = null
+                    this.filter = ''
                 } else {
                     this.cancelClicked()
                 }
@@ -99,6 +100,7 @@
                     student: null
                 })
                 this.selected = null
+                this.filter = ''
             }
         },
         computed: {

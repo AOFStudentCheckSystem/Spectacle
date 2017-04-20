@@ -43,7 +43,7 @@
 </style>
 
 <template>
-  <div class="view-container">
+  <div class="view-container" @click="statusBarClick">
     <div class="box webkit-draggable">
       <div class="item spectacle">Spectacle</div>
       <div class="item clock">{{displayTime}}</div>
@@ -62,8 +62,10 @@
 <script>
     import moment from 'moment'
     import {mapActions, mapGetters} from 'vuex'
+    import {EventBusMixin} from '../../mixins/event-bus'
 
     export default {
+        mixins: [EventBusMixin],
         data () {
             return {
                 date: moment(),
@@ -81,7 +83,10 @@
             ...mapActions([
                 'setCharge',
                 'setCharging'
-            ])
+            ]),
+            statusBarClick () {
+                this.$publish(this.$channels.STATUS_BAR_CLICK)
+            }
         },
         computed: {
             displayTime () {

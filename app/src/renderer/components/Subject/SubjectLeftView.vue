@@ -47,7 +47,7 @@
       Searchbar to search thorugh VL Items
       List to search specified in "search-list" prop
     -->
-    <search-bar v-model="filter" @input="$refs['virtualscroller'].updateVisibleItems()" @overlayActive="overlayActive = $event"></search-bar>
+    <search-bar v-model="filter" @refresh="$refs['virtualscroller'].updateVisibleItems()" @overlayActive="overlayActive = $event"></search-bar>
     <search-bar-overlay :active="overlayActive"></search-bar-overlay>
 
     <!-- This block will become visible when there is nothing found -->

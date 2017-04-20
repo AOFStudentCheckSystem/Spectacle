@@ -5,15 +5,15 @@
       <f7-list-button @click="exportBroken" title="Export Errored Events"></f7-list-button>
       <f7-list-button @click="exportRemote" title="Export Remote Events"></f7-list-button>
       <f7-list-button @click="exportLocal" title="Export Local Events"></f7-list-button>
-      <f7-list-button @click="clearEvents" title="Empty Persistence Store"></f7-list-button>
+      <f7-list-button v-if="isAdmin" @click="clearEvents" title="Empty Persistence Store"></f7-list-button>
     </f7-list>
-    <f7-block-title>Subjects</f7-block-title>
-    <f7-list tablet-inset>
+    <f7-block-title v-if="isAdmin">Subjects</f7-block-title>
+    <f7-list tablet-inset v-if="isAdmin">
       <f7-list-button @click="clearSubjects" title="Empty Persistence Store"></f7-list-button>
     </f7-list>
     <f7-block-title>Authentication</f7-block-title>
     <f7-list tablet-inset>
-      <f7-list-button @click="resetAuth" title="Empty Persistence Store"></f7-list-button>
+      <f7-list-button v-if="isAdmin" @click="resetAuth" title="Empty Persistence Store"></f7-list-button>
       <f7-list-button :disabled="!online" @click="authenticationClicked" :title="authenticationTitle"></f7-list-button>
     </f7-list>
     <f7-block-title class="center">Built by Yaotian Feng, Peiqi Liu, Yuanchu Xie with ♥</f7-block-title>
@@ -34,7 +34,8 @@
                 'online',
                 'brokenEvents',
                 'events',
-                'localEvents'
+                'localEvents',
+                'isAdmin'
             ]),
             authenticationClassObject () {
                 return {
@@ -87,9 +88,9 @@
                     if (filePath) {
                         fs.writeFile(filePath, JSON.stringify(obj, null, 4), function (err) {
                             if (err) {
-                                self.$f7.alert('Error', err)
+                                self.$f7.alert(err, 'Error')
                             } else {
-                                self.$f7.alert('Spectacular!', 'Success')
+                                self.$f7.alert('The events have been saved.', 'Spectacular!')
                             }
                         })
                     }

@@ -8,7 +8,9 @@ const $channels = {
     'LEFT_VIEW_ROUTE': c++,
     'OPEN_EVENT_POPUP': c++,
     'SELECT_STUDENT_POPUP': c++,
-    'SELECTED_STUDENT': c++
+    'SELECTED_STUDENT': c++,
+    'STATUS_BAR_CLICK': c++,
+    'EVENT_TAB_SHOW': c++
 }
 
 export default $channels

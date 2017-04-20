@@ -132,6 +132,15 @@ const getters = {
 }
 
 const actions = {
+    async emailEvent ({rootState}, {event, email}) {
+        if (!rootState.auth.offline && event instanceof ActivityEvent) {
+            const result = await api.sendMail(event.id, email)
+            if (!result.success) {
+                console.log(result)
+                throw result.error
+            }
+        }
+    },
     async createEvent ({commit, rootState, dispatch}, {event}) {
         if (rootState.auth.offline) {
             commit(types.ADD_TO_LOCAL_EVENTS, {localEvent: event})
@@ -154,7 +163,7 @@ const actions = {
             commit(types.ADD_TO_LOCAL_EVENTS, {localEvent: event})
         }
     },
-    async refreshEvents ({commit, rootState}) {
+    async refreshEvents ({commit, state, rootState}) {
         if (!rootState.auth.offline) {
             // const currentEvent = state.currentEvent
             // commit(types.SET_ALL_EVENTS, {
@@ -165,6 +174,12 @@ const actions = {
             commit(types.SET_ALL_EVENTS, {
                 events: await api.listAllEvents()
             })
+            const currentEvent = state.currentEvent
+            if (currentEvent && currentEvent.id) {
+                if (!state.events.some((event) => event.id === currentEvent.id)) {
+                    commit(types.SET_CURRENT_EVENT, {event: null})
+                }
+            }
         }
     },
     async pullCurrentEvent ({state, dispatch, commit, rootState}, {id}) {
@@ -364,7 +379,7 @@ const actions = {
                         }
                         element.id = eventId
 
-                        if (!remoteEvents.some(remoteEvent => remoteEvent.id === element.id)) {
+                        if (element.hasRemote && !remoteEvents.some(remoteEvent => remoteEvent.id === element.id)) {
                             commit(types.APPEND_BROKEN_EVENT, {broken: element})
                             console.error('event has been deleted at remote, saving to broken events')
                             toRemove.push(element)

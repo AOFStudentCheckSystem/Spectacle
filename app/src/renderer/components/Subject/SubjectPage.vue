@@ -33,8 +33,8 @@
         <f7-label>Card Secret</f7-label>
         <f7-input type="text" disabled :value="currentStudent.cardSecret"></f7-input>
       </f7-list-item>
-      <f7-list-button :title="scanTitle" @click="onClick"></f7-list-button>
-      <f7-list-button title="Clear Card Secret" @click="clearCardSecret"></f7-list-button>
+      <f7-list-button v-if="isAdmin" :title="scanTitle" @click="onClick"></f7-list-button>
+      <f7-list-button v-if="isAdmin" title="Clear Card Secret" @click="clearCardSecret"></f7-list-button>
     </f7-list>
     <div v-else>
       <f7-block-title>To start using this app</f7-block-title>
@@ -50,7 +50,8 @@
     export default {
         computed: {
             ...mapGetters([
-                'currentStudent'
+                'currentStudent',
+                'isAdmin'
             ]),
             scanTitle () {
                 return this.smart ? 'Stop Scanning' : 'Scan Card'

@@ -23,7 +23,7 @@
       </f7-nav-right>
     </f7-navbar>
 
-    <search-bar v-model="filter" @input="$refs['virtualscroller'].updateVisibleItems()" @overlayActive="overlayActive = $event"></search-bar>
+    <search-bar v-model="filter" @refresh="$refs['virtualscroller'].updateVisibleItems()" @overlayActive="overlayActive = $event"></search-bar>
     <search-bar-overlay :active="overlayActive"></search-bar-overlay>
 
     <f7-block>
@@ -114,7 +114,8 @@
                 displayPhoto: false,
                 filter: '',
                 overlayActive: false,
-                remove: false
+                remove: false,
+                activeSubscription: null
             }
         },
         computed: {
@@ -263,11 +264,15 @@
                     console.log(error)
                 })
             })
+            this.activeSubscription = this.$subscribe(this.$channels.EVENT_TAB_SHOW, ({status}) => {
+                self.setPageActive(status)
+            })
         },
         beforeDestroy () {
             this.smart ? this.smart.close() : undefined
             this.errorCallbackUnsubscriber ? this.errorCallbackUnsubscriber() : undefined
             this.connectCallbackUnsubscriber ? this.connectCallbackUnsubscriber() : undefined
+            this.activeSubscription ? this.$unsubscribe(this.activeSubscription) : undefined
         }
     }
 </script>
