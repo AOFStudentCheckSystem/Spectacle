@@ -24,35 +24,16 @@
       </f7-navbar>
       <f7-pages>
         <f7-page>
-          <f7-searchbar cancel-link="Cancel" ref="searchbar"
-                        :params="{ searchList: '#empty-card-list',
-                  searchIn: '.item-title, .item-subtitle',
-                  notFound: '.empty-card-searchbar-not-found',
-                  found: '.empty-card-searchbar-found'
-    }"></f7-searchbar>
+          <search-bar v-model="filter" @input="$refs['virtualscroller'].updateVisibleItems()" @overlayActive="overlayActive = $event"></search-bar>
+          <search-bar-overlay :active="overlayActive"></search-bar-overlay>
 
           <!-- This block will become visible when there is nothing found -->
-          <f7-list class="searchbar-not-found empty-card-searchbar-not-found" tablet-inset>
+          <f7-list tablet-inset v-show="filteredStudents.length === 0">
             <f7-list-item title="Nothing found"></f7-list-item>
           </f7-list>
 
-          <!-- Search through this list -->
-          <!--<f7-list-->
-                  <!--id="empty-card-list"-->
-                  <!--class="empty-card-searchbar-found remove-list-margin"-->
-                  <!--media-list tablet-inset-->
-          <!--&gt;-->
-            <!--<f7-list-item media-item-->
-                          <!--v-for="e in students" :title="e.lastName + ', ' + e.firstName"-->
-                          <!--:subtitle="e.idNumber"-->
-                          <!--@click="onClick(e)"-->
-                          <!--:class="computedClass(e)"-->
-            <!--&gt;-->
-            <!--</f7-list-item>-->
-          <!--</f7-list>-->
-
-          <virtual-scroller id="empty-card-list" containerTag="ul" mainTag="div" :class="['list-block', 'media-list', 'empty-card-searchbar-found', 'tablet-inset']"
-                            :items="students" :itemHeight="63" keyField="idNumber">
+          <virtual-scroller ref="virtualscroller" id="empty-card-list" containerTag="ul" mainTag="div" :class="['list-block', 'media-list', 'empty-card-searchbar-found', 'tablet-inset']"
+                            :items="filteredStudents" :itemHeight="63" keyField="idNumber" v-show="filteredStudents.length !== 0">
             <template scope="props">
               <li class="item-content media-item"
                   @click="onClick(props.item)"
@@ -76,13 +57,18 @@
 <script>
     import {mapActions, mapGetters} from 'vuex'
     import {EventBusMixin} from '../../mixins/event-bus'
+    import SearchBar from '../Master/SearchBar.vue'
+    import SearchBarOverlay from '../Master/SearchBarOverlay.vue'
 
     export default {
         mixins: [EventBusMixin],
+        components: {SearchBar, SearchBarOverlay},
         data () {
             return {
                 selected: null,
-                subscription: null
+                subscription: null,
+                filter: '',
+                overlayActive: false
             }
         },
         methods: {
@@ -104,8 +90,6 @@
                     })
                     this.$refs['popup'].close()
                     this.selected = null
-                    this.$refs['searchbar'].empty()
-                    this.$refs['searchbar'].disable()
                 } else {
                     this.cancelClicked()
                 }
@@ -114,15 +98,20 @@
                 this.$publish(this.$channels.SELECTED_STUDENT, {
                     student: null
                 })
-                this.$refs['searchbar'].empty()
-                this.$refs['searchbar'].disable()
                 this.selected = null
             }
         },
         computed: {
             ...mapGetters([
                 'students'
-            ])
+            ]),
+            filteredStudents () {
+                const filter = this.filter
+                return this.filter === '' ? this.students : this.students.filter((student) => {
+                    const fullName = (student.firstName + ' ' + student.lastName + ' ' + student.preferredName).toLowerCase()
+                    return fullName.includes(filter)
+                })
+            }
         },
         created () {
             this.refreshStudents()

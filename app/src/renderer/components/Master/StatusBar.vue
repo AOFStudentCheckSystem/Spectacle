@@ -48,8 +48,10 @@
       <div class="item spectacle">Spectacle</div>
       <div class="item clock">{{displayTime}}</div>
       <div class="item battery">
-        <i v-if="offline" class="icon icon-cloud_download_fill" aria-hidden="true"></i>
-        <i v-else class="icon icon-cloud_fill" aria-hidden="true"></i>
+        <i v-if="offline" class="fa fa-cloud-download" aria-hidden="true"></i>
+
+        <i class="fa fa-cloud" aria-hidden="true" v-else></i>
+
         {{charge}}% <i class="fa" :class="batteryClass" aria-hidden="true"></i> <i class="fa fa-bolt" v-if="charging"
                                                                                    aria-hidden="true"></i>
       </div>
@@ -94,23 +96,26 @@
                 return this.batteryMap[Math.round(this.charge / 25)]
             }
         },
-        created () {
+        mounted () {
             const self = this
             this.intervalId = window.setInterval(() => {
                 self.date = moment()
             }, 1000)
-            navigator.getBattery().then(function (battery) {
-                self.setCharging({charging: battery.charging})
-                self.setCharge({charge: Math.floor(battery.charge * 100)})
-
-                battery.addEventListener('chargingchange', function () {
+            navigator.getBattery()
+                .then((battery) => {
                     self.setCharging({charging: battery.charging})
-                })
+                    self.setCharge({charge: Math.floor(battery.level * 100)})
 
-                battery.addEventListener('levelchange', function () {
-                    self.setCharge({charge: Math.floor(battery.charge * 100)})
+                    battery.addEventListener('chargingchange', function () {
+                        self.setCharging({charging: battery.charging})
+                        console.log(battery)
+                    })
+
+                    battery.addEventListener('levelchange', function () {
+                        self.setCharge({charge: Math.floor(battery.level * 100)})
+                        console.log(battery)
+                    })
                 })
-            })
         },
         beforeDestroy () {
             window.clearInterval(this.intervalId)

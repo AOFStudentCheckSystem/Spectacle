@@ -343,6 +343,7 @@ const actions = {
         if (!rootState.auth.offline) {
             const toRemove = []
             if (state.localEvents) {
+                const remoteEvents = await api.listAllEvents()
                 const duplicateLocalEvents = JSON.parse(JSON.stringify(state.localEvents))
                 for (const element of duplicateLocalEvents) {
                     try {
@@ -362,6 +363,14 @@ const actions = {
                             continue
                         }
                         element.id = eventId
+
+                        if (!remoteEvents.some(remoteEvent => remoteEvent.id === element.id)) {
+                            commit(types.APPEND_BROKEN_EVENT, {broken: element})
+                            console.error('event has been deleted at remote, saving to broken events')
+                            toRemove.push(element)
+                            continue
+                        }
+
                         const editResult = await api.editEvent(element, element)
                         if (!editResult.success) {
                             console.error('failed to push edits for', element)

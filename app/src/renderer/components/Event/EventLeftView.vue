@@ -56,32 +56,37 @@
       Searchbar to search thorugh VL Items
       List to search specified in "search-list" prop
     -->
-    <f7-searchbar cancel-link="Cancel"
-                  :params="{ searchList: '#search-list', searchIn: '.item-title, .badge'}"></f7-searchbar>
+    <!--<f7-searchbar cancel-link="Cancel"-->
+                  <!--:params="{ customSearch: true }"-->
+                  <!--@searchbar:search="onSearch"></f7-searchbar>-->
+
+    <!-- Search Bar overlay-->
+    <search-bar v-model="filter" @input="$refs['virtualscroller'].updateVisibleItems()" @overlayActive="overlayActive = $event"></search-bar>
+    <search-bar-overlay :active="overlayActive"></search-bar-overlay>
 
     <!-- This block will become visible when there is nothing found -->
-    <f7-list class="searchbar-not-found">
-      <f7-list-item title="Nothing found"></f7-list-item>
+    <f7-list v-show="filteredEvents.length === 0">
+      <f7-list-item title="No Events Available"></f7-list-item>
     </f7-list>
 
     <!-- Search through this list -->
     <!--<f7-list-->
-            <!--id="search-list"-->
-            <!--class="searchbar-found remove-list-margin"-->
-            <!--media-list-->
+    <!--id="search-list"-->
+    <!--class="searchbar-found remove-list-margin"-->
+    <!--media-list-->
     <!--&gt;-->
-      <!--<f7-list-item-->
-              <!--:badge="e.status === 0 ? 'Future' : e.status === 1 ? 'Boarding' : 'Complete'"-->
-              <!--:badge-color="e.status === 0 ? 'blue' : e.status === 1 ? 'red' : 'green'"-->
-              <!--@click="onClick(e.id)"-->
-              <!--class="item-link"-->
-              <!--:class="classObjForEvent(e)"-->
-      <!--&gt;-->
-      <!--</f7-list-item>-->
+    <!--<f7-list-item-->
+    <!--:badge="e.status === 0 ? 'Future' : e.status === 1 ? 'Boarding' : 'Complete'"-->
+    <!--:badge-color="e.status === 0 ? 'blue' : e.status === 1 ? 'red' : 'green'"-->
+    <!--@click="onClick(e.id)"-->
+    <!--class="item-link"-->
+    <!--:class="classObjForEvent(e)"-->
+    <!--&gt;-->
+    <!--</f7-list-item>-->
     <!--</f7-list>-->
-    <virtual-scroller id="search-list" containerTag="ul" mainTag="div"
-                      :class="['list-block', 'media-list', 'searchbar-found']"
-                      :items="mergedEvents" :itemHeight="63" keyField="id">
+    <virtual-scroller ref="virtualscroller" id="event-search-list" containerTag="ul" mainTag="div"
+                      :class="['list-block', 'media-list', 'event-searchbar-found']"
+                      :items="filteredEvents" :itemHeight="63" keyField="id" v-show="filteredEvents.length !== 0">
       <template scope="props">
         <li class="item-link" @click="onClick(props.item.id)" :class="classObjForEvent(props.item)"
             :key="props.itemKey">
@@ -108,11 +113,20 @@
     import {ActivityEvent, LocalEvent} from '../../models/event'
     import {EventBusMixin} from '../../mixins/event-bus'
     import moment from 'moment'
+    import SearchBar from '../Master/SearchBar.vue'
+    import SearchBarOverlay from '../Master/SearchBarOverlay.vue'
     //    import CreatePopup from './CreatePopup.vue'
 
     export default {
 //        components: {CreatePopup},
         mixins: [EventBusMixin],
+        components: {SearchBar, SearchBarOverlay},
+        data () {
+            return {
+                filter: '',
+                overlayActive: false
+            }
+        },
         methods: {
             addNewItem () {
 //                this.$refs['popup'].open()
@@ -157,7 +171,14 @@
             ...mapGetters([
                 'mergedEvents',
                 'currentEvent'
-            ])
+            ]),
+            filteredEvents () {
+                const filter = this.filter
+                return this.filter === '' ? this.mergedEvents : this.mergedEvents.filter((event) => {
+                    const status = (event.status === 0 ? 'Future' : event.status === 1 ? 'Boarding' : 'Complete')
+                    return event.name.toLowerCase().includes(filter) || status.toLowerCase().includes(filter)
+                })
+            }
         },
         created () {
             this.refreshEvents()

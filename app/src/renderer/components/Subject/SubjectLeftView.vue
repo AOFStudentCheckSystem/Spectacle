@@ -47,20 +47,16 @@
       Searchbar to search thorugh VL Items
       List to search specified in "search-list" prop
     -->
-    <f7-searchbar cancel-link="Cancel"
-                  :params="{ searchList: '#student-list',
-                  searchIn: '.item-title',
-                  notFound: '.student-searchbar-not-found',
-                  found: '.student-searchbar-found'
-    }"></f7-searchbar>
+    <search-bar v-model="filter" @input="$refs['virtualscroller'].updateVisibleItems()" @overlayActive="overlayActive = $event"></search-bar>
+    <search-bar-overlay :active="overlayActive"></search-bar-overlay>
 
     <!-- This block will become visible when there is nothing found -->
-    <f7-list class="searchbar-not-found student-searchbar-not-found">
+    <f7-list v-show="filteredStudents.length === 0">
       <f7-list-item title="Nothing found"></f7-list-item>
     </f7-list>
 
-    <virtual-scroller id="student-list" containerTag="ul" mainTag="div" :class="['list-block', 'media-list', 'student-searchbar-found']"
-                      :items="students" :itemHeight="63" keyField="idNumber">
+    <virtual-scroller ref="virtualscroller" id="student-list" containerTag="ul" mainTag="div" :class="['list-block', 'media-list', 'student-searchbar-found']"
+                      :items="filteredStudents" :itemHeight="63" keyField="idNumber" v-show="filteredStudents.length !== 0">
       <template scope="props">
         <li class="item-content media-item item-link"
             @click="onClick(props.item.idNumber)"
@@ -81,8 +77,17 @@
 
 <script>
     import {mapActions, mapGetters} from 'vuex'
-    export default {
+    import SearchBar from '../Master/SearchBar.vue'
+    import SearchBarOverlay from '../Master/SearchBarOverlay.vue'
 
+    export default {
+        components: {SearchBar, SearchBarOverlay},
+        data () {
+            return {
+                filter: '',
+                overlayActive: false
+            }
+        },
         methods: {
             ...mapActions([
                 'refreshStudents'
@@ -120,7 +125,14 @@
             ...mapGetters([
                 'students',
                 'currentStudent'
-            ])
+            ]),
+            filteredStudents () {
+                const filter = this.filter
+                return this.filter === '' ? this.students : this.students.filter((student) => {
+                    const fullName = (student.firstName + ' ' + student.lastName + ' ' + student.preferredName).toLowerCase()
+                    return fullName.includes(filter)
+                })
+            }
         },
         created () {
             this.refreshStudents()

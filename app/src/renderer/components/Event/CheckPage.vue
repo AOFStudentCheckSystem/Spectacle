@@ -2,7 +2,13 @@
 * Created by dummy on 4/14/17.
 */
 <style scoped>
+  .remove-top-margin {
+    margin-top: 0 !important;
+  }
 
+  .remove-all-margin {
+    margin: 0 !important;
+  }
 </style>
 
 <template>
@@ -11,25 +17,45 @@
     <f7-navbar :title="computedTitle" back-link="Back" sliding>
       <f7-nav-right>
         <f7-link @click="stupidKidForgotHisCard">
-          <f7-icon f7="add_round"></f7-icon>
+          <f7-icon v-if="remove" f7="delete_round"></f7-icon>
+          <f7-icon v-else f7="add_round"></f7-icon>
         </f7-link>
       </f7-nav-right>
     </f7-navbar>
 
-    <f7-searchbar cancel-link="Cancel"
-                  :params="{ searchList: '#check-list',
-                  searchIn: '.item-title, .badge',
-                  notFound: '.check-searchbar-not-found',
-                  found: '.check-searchbar-found'
-    }"></f7-searchbar>
+    <search-bar v-model="filter" @input="$refs['virtualscroller'].updateVisibleItems()" @overlayActive="overlayActive = $event"></search-bar>
+    <search-bar-overlay :active="overlayActive"></search-bar-overlay>
 
-    <!-- This block will become visible when there is nothing found -->
-    <f7-list class="searchbar-not-found check-searchbar-not-found" tablet-inset>
-      <f7-list-item title="Nothing found"></f7-list-item>
-    </f7-list>
+    <f7-block>
+      <f7-grid>
+        <f7-col :width="75 + !displayPhoto * 25">
+          <f7-list no-hairlines no-hairlines-between inset class="remove-all-margin">
+            <f7-list-item :title="'Records: ' + amountRecords"></f7-list-item>
+            <f7-list-item :title="'Add: ' + amountAdd"></f7-list-item>
+            <f7-list-item :title="'Remove: ' + amountRemove"></f7-list-item>
+            <li class="media-item">
+              <div class="item-content">
+                <div class="item-inner">
+                  <div class="item-title-row">
+                    <div class="item-title">Scan To Remove</div>
+                    <div class="item-after">
+                      <f7-input type="switch" @input="setRemoveValue" :value="remove"></f7-input>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </li>
+          </f7-list>
+        </f7-col>
+        <f7-col v-if="displayPhoto" :width="25">
+          <f7-block inset class="remove-all-margin">Reserved</f7-block>
+        </f7-col>
+      </f7-grid>
+    </f7-block>
 
-    <virtual-scroller id="check-list" containerTag="ul" mainTag="div" :class="['list-block', 'media-list', 'check-searchbar-found', 'tablet-inset']"
-                      :items="sortedCurrentEventRecords" :itemHeight="63" keyField="id">
+    <virtual-scroller ref="virtualscroller" v-show="filteredCurrentEventRecords.length > 0" id="check-list" containerTag="ul" mainTag="div"
+                      :class="['list-block', 'media-list', 'check-searchbar-found', 'tablet-inset']"
+                      :items="filteredCurrentEventRecords" :itemHeight="63" keyField="id">
       <template scope="props">
         <li class="swipeout"
             :key="props.itemKey">
@@ -38,23 +64,27 @@
               <div class="item-inner">
                 <div class="item-title-row">
                   <div class="item-title">{{props.item.student.lastName + ', ' + props.item.student.firstName}}</div>
-                  <div class="item-after"><span class="badge" :class="props.item.checkInTime >= 0 ? 'color-blue' : 'color-red'">{{props.item.checkInTime >= 0 ? 'Checked' : 'Removed'}}</span></div>
+                  <div class="item-after"><span class="badge"
+                                                :class="props.item.checkInTime >= 0 ? 'color-blue' : 'color-red'">{{props.item.checkInTime >= 0 ? 'Checked' : 'Removed'}}</span>
+                  </div>
                 </div>
                 <div class="item-subtitle">{{props.item.student.preferredName || props.item.student.firstName}}</div>
               </div>
             </div>
           </div>
           <!--<div class="swipeout-actions-left" v-if="props.item.checkInTime < 0">-->
-            <!--<a class="swipeout-close swipeout-overswipe bg-blue" href="#">Add</a>-->
+          <!--<a class="swipeout-close swipeout-overswipe bg-blue" href="#">Add</a>-->
           <!--</div>-->
           <!--<div class="swipeout-actions-right" v-if="props.item.checkInTime >= 0">-->
-            <!--<a class="swipeout-close swipeout-overswipe bg-red" href="#">Remove</a>-->
+          <!--<a class="swipeout-close swipeout-overswipe bg-red" href="#">Remove</a>-->
           <!--</div>-->
           <f7-swipeout-actions right v-if="props.item.checkInTime >= 0">
-            <f7-swipeout-button close overswipe color="red" @click="removeSwiped(props.item.student)">Remove</f7-swipeout-button>
+            <f7-swipeout-button close overswipe color="red" @click="removeSwiped(props.item.student)">Remove
+            </f7-swipeout-button>
           </f7-swipeout-actions>
           <f7-swipeout-actions left v-if="props.item.checkInTime < 0">
-            <f7-swipeout-button close overswipe color="blue" @click="addSwiped(props.item.student)">Add</f7-swipeout-button>
+            <f7-swipeout-button close overswipe color="blue" @click="addSwiped(props.item.student)">Add
+            </f7-swipeout-button>
           </f7-swipeout-actions>
         </li>
       </template>
@@ -68,16 +98,23 @@
     import {SmartCardController} from 'smartcard'
     import {ActivityEventRecord} from '../../models/event'
     import {EventBusMixin} from '../../mixins/event-bus'
+    import SearchBar from '../Master/SearchBar.vue'
+    import SearchBarOverlay from '../Master/SearchBarOverlay.vue'
 
     export default {
         mixins: [EventBusMixin],
+        components: {SearchBar, SearchBarOverlay},
         data () {
             return {
                 smart: null,
                 errorCallbackUnsubscriber: null,
                 connectCallbackUnsubscriber: null,
                 pageActive: false,
-                subscription: null
+                subscription: null,
+                displayPhoto: false,
+                filter: '',
+                overlayActive: false,
+                remove: false
             }
         },
         computed: {
@@ -91,9 +128,33 @@
             },
             checkable () {
                 return this.currentEvent ? this.currentEvent.status < 2 : false
+            },
+            amountRecords () {
+                return this.sortedCurrentEventRecords.length
+            },
+            amountAdd () {
+                return this.sortedCurrentEventRecords.reduce((acc, val) => {
+                    return val.checkInTime >= 0 ? ++acc : acc
+                }, 0)
+            },
+            amountRemove () {
+                return this.sortedCurrentEventRecords.reduce((acc, val) => {
+                    return val.checkInTime < 0 ? ++acc : acc
+                }, 0)
+            },
+            filteredCurrentEventRecords () {
+                const filter = this.filter
+                return this.filter === '' ? this.sortedCurrentEventRecords : this.sortedCurrentEventRecords.filter((record) => {
+                    const student = record.student
+                    const fullName = (student.firstName + ' ' + student.lastName + ' ' + student.preferredName).toLowerCase()
+                    return fullName.includes(filter)
+                })
             }
         },
         methods: {
+            setRemoveValue (event) {
+                this.remove = event
+            },
             setPageActive (active) {
                 this.pageActive = active
             },
@@ -123,6 +184,7 @@
             },
             addRecord (cardSecret) {
                 if (this.checkable) {
+                    const toRemove = this.remove ? -1 : 1
                     const cardSecretStudentMap = this.cardSecretStudentMap
                     const foundStudent = cardSecretStudentMap[cardSecret.toLowerCase()] ||
                         cardSecretStudentMap[cardSecret.toUpperCase()]
@@ -131,7 +193,7 @@
                             record: new ActivityEventRecord({
                                 student: foundStudent,
                                 signUpTime: -1,
-                                checkInTime: new Date().getTime()
+                                checkInTime: toRemove * new Date().getTime()
                             })
                         })
                         this.$forceUpdate()
@@ -147,7 +209,7 @@
                                         record: new ActivityEventRecord({
                                             student: student,
                                             signUpTime: -1,
-                                            checkInTime: new Date().getTime()
+                                            checkInTime: toRemove * new Date().getTime()
                                         })
                                     })
                                     self.$store.dispatch('patchStudentCardSecret', {
@@ -163,6 +225,7 @@
             stupidKidForgotHisCard () {
                 if (this.checkable) {
                     if (!this.subscription) {
+                        const toRemove = this.remove ? -1 : 1
                         this.$publish(this.$channels.SELECT_STUDENT_POPUP)
                         const self = this
                         this.subscription = this.$subscribe(this.$channels.SELECTED_STUDENT, ({student}) => {
@@ -173,7 +236,7 @@
                                     record: new ActivityEventRecord({
                                         student: student,
                                         signUpTime: -1,
-                                        checkInTime: new Date().getTime()
+                                        checkInTime: toRemove * new Date().getTime()
                                     })
                                 })
                                 self.$forceUpdate()
