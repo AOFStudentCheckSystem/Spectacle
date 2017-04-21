@@ -57,11 +57,12 @@
       List to search specified in "search-list" prop
     -->
     <!--<f7-searchbar cancel-link="Cancel"-->
-                  <!--:params="{ customSearch: true }"-->
-                  <!--@searchbar:search="onSearch"></f7-searchbar>-->
+    <!--:params="{ customSearch: true }"-->
+    <!--@searchbar:search="onSearch"></f7-searchbar>-->
 
     <!-- Search Bar overlay-->
-    <search-bar v-model="filter" @refresh="$refs['virtualscroller'].updateVisibleItems()" @overlayActive="overlayActive = $event"></search-bar>
+    <search-bar v-model="filter" @refresh="$refs['virtualscroller'].updateVisibleItems()"
+                @overlayActive="overlayActive = $event"></search-bar>
     <search-bar-overlay :active="overlayActive"></search-bar-overlay>
 
     <!-- This block will become visible when there is nothing found -->
@@ -99,7 +100,9 @@
                   {{props.item.status == 0 ? 'Future' : props.item.status === 1 ? 'Boarding' : 'Complete'}}</span>
                 </div>
               </div>
-              <div class="item-subtitle">{{props.item.description || formatTime(props.item.time)}}</div>
+              <div class="item-subtitle">
+                {{ props.item.description ? props.item.description.trim() === '' ? formatTime(props.item.time) : props.item.description : formatTime(props.item.time)}}
+              </div>
             </div>
           </div>
         </li>

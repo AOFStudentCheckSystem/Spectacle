@@ -52,7 +52,7 @@ const mutations = {
         if (patch.status) {
             event.status = patch.status
         }
-        if (state.currentEvent instanceof LocalEvent) {
+        if (event instanceof LocalEvent) {
             event.dirty = true
         }
     },
@@ -71,12 +71,12 @@ const mutations = {
         }
     },
     [types.ADD_TO_LOCAL_EVENTS] (state, {localEvent}) {
-        const currentEvent = state.currentEvent
+        // const currentEvent = state.currentEvent
         const existingEvent = state.localEvents.find((event) => event.localId === localEvent.localId)
         if (!existingEvent) state.localEvents.unshift(localEvent)
-        if (currentEvent instanceof LocalEvent) {
-            currentEvent.dirty = true
-        }
+        // if (currentEvent instanceof LocalEvent && currentEvent.localId === localEvent.localId) {
+        //     currentEvent.dirty = true
+        // }
     },
     [types.REMOVE_FROM_LOCAL_EVENTS] (state, {localEvent}) {
         state.localEvents = state.localEvents.filter((event) => event.localId !== localEvent.localId)
@@ -386,11 +386,16 @@ const actions = {
                             continue
                         }
 
-                        const editResult = await api.editEvent(element, element)
-                        if (!editResult.success) {
-                            console.error('failed to push edits for', element)
-                            commit(types.APPEND_BROKEN_EVENT, {broken: element})
+                        if (element.dirty) {
+                            const editResult = await api.editEvent(element, element)
+                            if (!editResult.success) {
+                                console.error('failed to push edits for', element)
+                                commit(types.APPEND_BROKEN_EVENT, {broken: element})
+                            } else {
+                                console.log('pushed dirty event', element)
+                            }
                         }
+
                         if (element.records && element.records.length > 0 && element.status < 2) {
                             const recordResult = await checkApi.submitRecords(element, element.records)
                             if (recordResult) {
