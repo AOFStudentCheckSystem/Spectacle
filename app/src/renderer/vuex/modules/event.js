@@ -23,16 +23,16 @@ const mutations = {
         state.currentEvent = event
     },
     [types.PATCH_CURRENT_EVENT] (state, {patch}) {
-        if (patch.name) {
+        if (patch.name !== undefined && patch.name !== null) {
             state.currentEvent.name = patch.name
         }
         if (patch.time) {
             state.currentEvent.time = patch.time
         }
-        if (patch.description) {
+        if (patch.description !== undefined && patch.description !== null) {
             state.currentEvent.description = patch.description
         }
-        if (patch.status) {
+        if (patch.status !== undefined && patch.status !== null) {
             state.currentEvent.status = patch.status
         }
         if (state.currentEvent instanceof LocalEvent) {
@@ -40,16 +40,16 @@ const mutations = {
         }
     },
     [types.PATCH_EVENT] (state, {event, patch}) {
-        if (patch.name) {
+        if (patch.name !== undefined && patch.name !== null) {
             event.name = patch.name
         }
         if (patch.time) {
             event.time = patch.time
         }
-        if (patch.description) {
+        if (patch.description !== undefined && patch.description !== null) {
             event.description = patch.description
         }
-        if (patch.status) {
+        if (patch.status !== undefined && patch.status !== null) {
             event.status = patch.status
         }
         if (event instanceof LocalEvent) {
@@ -294,7 +294,7 @@ const actions = {
             dispatch('refreshEvents')
         }
     },
-    async patchEvent ({commit, rootState}, {event, patch}) {
+    async patchEvent ({commit, state, rootState}, {event, patch}) {
         if (event.status > 1) {
             commit(types.APPEND_BROKEN_EVENT, {broken: event})
             console.error('event is complete')
@@ -305,9 +305,13 @@ const actions = {
             commit(types.PATCH_EVENT, {event, patch})
             return
         }
+
         if (rootState.auth.offline && event instanceof ActivityEvent) {
             const localEvent = new LocalEvent(event)
-            commit(types.SET_CURRENT_EVENT, {event: localEvent})
+            const currentEvent = state.currentEvent
+            if (currentEvent && currentEvent.id === localEvent.id) {
+                commit(types.SET_CURRENT_EVENT, {event: localEvent})
+            }
             commit(types.ADD_TO_LOCAL_EVENTS, {localEvent: localEvent})
             commit(types.PATCH_EVENT, {event, patch})
             return
@@ -321,7 +325,10 @@ const actions = {
             if (!e.response && event instanceof ActivityEvent) {
                 commit(types.PATCH_EVENT, {event, patch: previousState})
                 const localEvent = new LocalEvent(event)
-                commit(types.SET_CURRENT_EVENT, {event: localEvent})
+                const currentEvent = state.currentEvent
+                if (currentEvent && currentEvent.id === localEvent.id) {
+                    commit(types.SET_CURRENT_EVENT, {event: localEvent})
+                }
                 commit(types.ADD_TO_LOCAL_EVENTS, {localEvent: localEvent})
                 commit(types.PATCH_EVENT, {event: localEvent, patch})
             } else {
