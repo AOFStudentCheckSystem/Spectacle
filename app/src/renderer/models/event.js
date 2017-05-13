@@ -45,7 +45,7 @@ export class LocalEvent {
         } else {
             this.hasRemote = false
             this.dirty = true
-            this.id = null
+            this.id = String(Math.random())
             this.localId = String(Math.random())
             this.name = ''
             this.time = new Date().getTime()

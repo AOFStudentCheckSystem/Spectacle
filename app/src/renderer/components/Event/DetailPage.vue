@@ -10,12 +10,12 @@
       <f7-list-item>
         <f7-label>Name</f7-label>
         <f7-input :disabled="disabled" v-model="name" type="textarea" placeholder="Name"
-                  @input="throttledEditName(currentEvent)"></f7-input>
+                  @input="throttledEditName(currentEvent, name)"></f7-input>
       </f7-list-item>
       <f7-list-item>
         <f7-label>Description</f7-label>
         <f7-input :disabled="disabled" v-model="description" type="textarea" placeholder="Description"
-                  @input="throttledEditDescription(currentEvent)"></f7-input>
+                  @input="throttledEditDescription(currentEvent, description)"></f7-input>
       </f7-list-item>
       <f7-list-item>
         <f7-label>Date</f7-label>
@@ -136,7 +136,11 @@
                             if (self.pickerValue.minute !== minute || self.pickerValue.hour !== hour) {
                                 self.pickerValue.minute = minute
                                 self.pickerValue.hour = hour
-                                self.throttledEditTime(self.currentEvent)
+                                self.throttledEditTime(self.currentEvent, new Date(this.calendarValue.year,
+                                    this.calendarValue.month,
+                                    this.calendarValue.date,
+                                    this.pickerValue.hour,
+                                    this.pickerValue.minute).getTime())
                             }
                         }, date))
                 }
@@ -153,7 +157,11 @@
                                 self.calendarValue.month = month
                                 self.calendarValue.date = date
                                 self.calendarValue.year = year
-                                self.throttledEditTime(self.currentEvent)
+                                self.throttledEditTime(self.currentEvent, new Date(this.calendarValue.year,
+                                    this.calendarValue.month,
+                                    this.calendarValue.date,
+                                    this.pickerValue.hour,
+                                    this.pickerValue.minute).getTime())
                             }
                         }, date))
                 }
@@ -166,37 +174,33 @@
                 this.calendar = null
                 this.picker = null
             },
-            editName (event) {
+            editName (event, name) {
                 if (event.status < 2) {
                     this.$store.dispatch('patchEvent', {
                         event,
                         patch: {
-                            name: this.name
+                            name: name
                         }
                     })
                 }
             },
-            editDescription (event) {
+            editDescription (event, description) {
                 if (event.status < 2) {
                     this.$store.dispatch('patchEvent', {
                         event,
                         patch: {
-                            description: this.description
+                            description: description
                         }
                     })
                 }
             },
-            editTime (event) {
+            editTime (event, time) {
                 if (event) {
                     if (event.status < 2) {
                         this.$store.dispatch('patchEvent', {
                             event,
                             patch: {
-                                time: new Date(this.calendarValue.year,
-                                    this.calendarValue.month,
-                                    this.calendarValue.date,
-                                    this.pickerValue.hour,
-                                    this.pickerValue.minute).getTime()
+                                time: time
                             }
                         })
                     }

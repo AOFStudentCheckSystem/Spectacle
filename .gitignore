@@ -15,3 +15,4 @@ yarn.lock
 .ipr
 dist/*
 app/dist/*
+*.log

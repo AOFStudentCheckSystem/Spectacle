@@ -5,6 +5,8 @@ import * as types from './mutation-types'
 import {UserToken} from '../models/user'
 import {ActivityEvent, LocalEvent} from '../models/event'
 import {Student} from '../models/student'
+import fs from 'fs'
+import moment from 'moment'
 
 function localStoragePlugin (mut, preprocess) {
     const deserialize = JSON.parse
@@ -124,6 +126,21 @@ export const remoteRecordPersistencePlugin = localStoragePatchPlugin(types.ADD_E
     store => {
         return {events: store.state.event.events}
     }, types.SET_ALL_EVENTS)
+
+export const verboseLoggingPlugin = store => {
+    store.subscribe(({type, payload}) => {
+        if (store.state.safeguard.verbose) {
+            const message = JSON.stringify(payload)
+            const currentTime = moment()
+            const fileName = currentTime.format('YYYY-MM-DD') + '.log'
+            fs.appendFile(fileName, `[${currentTime.format()}/${type}] ${message}\n`, function (err) {
+                if (err) throw console.error(err)
+                console.log(type, message)
+            })
+        }
+    })
+}
+
 // export const eventBrokenPersistencePlugin = store => {
 //     const deserialize = JSON.parse
 //     const serialize = JSON.stringify

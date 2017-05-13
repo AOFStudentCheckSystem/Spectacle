@@ -56,6 +56,11 @@ const mutations = {
             event.dirty = true
         }
     },
+    [types.SET_EVENT_RECORDS] (state, {event, records}) {
+        if (!(event instanceof LocalEvent)) {
+            event.records = records
+        }
+    },
     [types.ADD_EVENT_RECORD] (state, {record}) {
         const currentEvent = state.currentEvent
         if (currentEvent) {
@@ -206,7 +211,7 @@ const actions = {
                 commit(types.SET_CURRENT_LOADING, {id: cachedEvent.id})
 
                 const remoteEvent = await api.pullEvent(id)
-                remoteEvent.records = await checkApi.getRecords(remoteEvent.id)
+                const records = await checkApi.getRecords(remoteEvent.id)
                 if (state.currentLoading === cachedEvent.id) {
                     const compareRecords = (x, y) => {
                         if (x.length !== y.length) return false
@@ -224,15 +229,19 @@ const actions = {
                         cachedEvent.id !== remoteEvent.id ||
                         cachedEvent.description !== remoteEvent.description ||
                         cachedEvent.time !== remoteEvent.time ||
-                        !compareRecords(cachedEvent.records, remoteEvent.records)
+                        !compareRecords(cachedEvent.records, records)
                     ) {
-                        commit(types.SET_CURRENT_EVENT, {event: remoteEvent})
+                        commit(types.PATCH_EVENT, {event: cachedEvent, patch: remoteEvent})
+                        commit(types.SET_EVENT_RECORDS, {event: cachedEvent, records})
+                        // commit(types.SET_CURRENT_EVENT, {event: remoteEvent})
                     }
                 }
             } else {
                 const remoteEvent = await api.pullEvent(id)
-                remoteEvent.records = await checkApi.getRecords(remoteEvent.id)
-                commit(types.SET_CURRENT_EVENT, {event: remoteEvent})
+                const records = await checkApi.getRecords(remoteEvent.id)
+                // commit(types.SET_CURRENT_EVENT, {event: remoteEvent})
+                commit(types.PATCH_EVENT, {event: cachedEvent, patch: remoteEvent})
+                commit(types.SET_EVENT_RECORDS, {event: cachedEvent, records})
             }
         }
     },
@@ -276,6 +285,7 @@ const actions = {
                 const localEvent = new LocalEvent(currentEvent)
                 commit(types.SET_CURRENT_EVENT, {event: localEvent})
                 commit(types.ADD_TO_LOCAL_EVENTS, {localEvent: localEvent})
+                commit(types.PATCH_CURRENT_EVENT, {patch: payload.patch})
                 return
             }
             commit(types.APPEND_BROKEN_EVENT, {broken: {patch: payload.patch, event: currentEvent}})
@@ -296,7 +306,9 @@ const actions = {
             return
         }
         if (rootState.auth.offline && event instanceof ActivityEvent) {
-            commit(types.ADD_TO_LOCAL_EVENTS, {localEvent: new LocalEvent(event)})
+            const localEvent = new LocalEvent(event)
+            commit(types.SET_CURRENT_EVENT, {event: localEvent})
+            commit(types.ADD_TO_LOCAL_EVENTS, {localEvent: localEvent})
             commit(types.PATCH_EVENT, {event, patch})
             return
         }
@@ -309,6 +321,7 @@ const actions = {
             if (!e.response && event instanceof ActivityEvent) {
                 commit(types.PATCH_EVENT, {event, patch: previousState})
                 const localEvent = new LocalEvent(event)
+                commit(types.SET_CURRENT_EVENT, {event: localEvent})
                 commit(types.ADD_TO_LOCAL_EVENTS, {localEvent: localEvent})
                 commit(types.PATCH_EVENT, {event: localEvent, patch})
             } else {

@@ -11,7 +11,7 @@
             <!--<f7-nav-left v-if="currentEvent">-->
             <!--<f7-link href="/event/edit/">Edit</f7-link>-->
             <!--</f7-nav-left>-->
-            <f7-nav-left v-if="currentEvent && currentEvent.status < 2">
+            <f7-nav-left v-if="displayComplete">
                 <f7-link href="#" @click="completeEvent">Complete</f7-link>
             </f7-nav-left>
             <f7-nav-center sliding>{{ computedTitle }}</f7-nav-center>
@@ -29,6 +29,7 @@
     import DetailPage from './DetailPage.vue'
     import {EventBusMixin} from '../../mixins/event-bus'
     import {mapGetters} from 'vuex'
+    import {LocalEvent} from '../../models/event'
 
     export default {
         mixins: [EventBusMixin],
@@ -50,7 +51,10 @@
             },
             ...mapGetters([
                 'currentEvent'
-            ])
+            ]),
+            displayComplete () {
+                return this.currentEvent && !(this.currentEvent instanceof LocalEvent) && this.currentEvent.status < 2
+            }
         },
         methods: {
             onTabHidden () {
@@ -95,6 +99,9 @@
                 if (newVal) {
                     this.setSidePanel()
                 }
+            },
+            'currentEvent.dirty': function (newVal) {
+                this.$forceUpdate()
             }
         }
     }

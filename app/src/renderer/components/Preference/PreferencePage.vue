@@ -6,6 +6,7 @@
       <f7-list-button @click="exportRemote" title="Export Remote Events"></f7-list-button>
       <f7-list-button @click="exportLocal" title="Export Local Events"></f7-list-button>
       <f7-list-button v-if="isAdmin" @click="clearEvents" title="Empty Persistence Store"></f7-list-button>
+      <f7-list-button @click="toggleVerbose" :title="verboseTitle"></f7-list-button>
     </f7-list>
     <f7-block-title v-if="isAdmin">Subjects</f7-block-title>
     <f7-list tablet-inset v-if="isAdmin">
@@ -35,7 +36,8 @@
                 'brokenEvents',
                 'events',
                 'localEvents',
-                'isAdmin'
+                'isAdmin',
+                'verbose'
             ]),
             authenticationClassObject () {
                 return {
@@ -44,9 +46,15 @@
             },
             authenticationTitle () {
                 return this.authenticated ? 'Sign Out' : 'Sign In'
+            },
+            verboseTitle () {
+                return this.verbose ? 'Disable Verbose Logging' : 'Enable Verbose Logging'
             }
         },
         methods: {
+            toggleVerbose () {
+                this.setVerbose({ verbose: !this.verbose })
+            },
             authenticationClicked () {
                 if (this.authenticated) {
                     this.signOut()
@@ -55,7 +63,8 @@
                 }
             },
             ...mapActions([
-                'signOut'
+                'signOut',
+                'setVerbose'
             ]),
             clearEvents () {
                 this.$store.commit(types.SET_ALL_EVENTS, {events: []})
