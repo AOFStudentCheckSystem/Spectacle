@@ -16,7 +16,7 @@
            @page:reinit="setPageActive(true)" @page:beforeremove="setPageActive(false)">
     <f7-navbar :title="computedTitle" back-link="Back" sliding>
       <f7-nav-right>
-        <f7-link @click="stupidKidForgotHisCard">
+        <f7-link @click="stupidKidForgotHisCard" v-if="currentEvent && currentEvent.status < 2">
           <f7-icon v-if="remove" f7="delete_round"></f7-icon>
           <f7-icon v-else f7="add_round"></f7-icon>
         </f7-link>
@@ -33,7 +33,7 @@
             <f7-list-item :title="'Records: ' + amountRecords"></f7-list-item>
             <f7-list-item :title="'Add: ' + amountAdd"></f7-list-item>
             <f7-list-item :title="'Remove: ' + amountRemove"></f7-list-item>
-            <li class="media-item">
+            <li class="media-item" v-if="currentEvent && currentEvent.status < 2">
               <div class="item-content">
                 <div class="item-inner">
                   <div class="item-title-row">
@@ -78,11 +78,11 @@
           <!--<div class="swipeout-actions-right" v-if="props.item.checkInTime >= 0">-->
           <!--<a class="swipeout-close swipeout-overswipe bg-red" href="#">Remove</a>-->
           <!--</div>-->
-          <f7-swipeout-actions right v-if="props.item.checkInTime >= 0">
+          <f7-swipeout-actions right v-if="props.item.checkInTime >= 0 && currentEvent.status < 2">
             <f7-swipeout-button close overswipe color="red" @click="removeSwiped(props.item.student)">Remove
             </f7-swipeout-button>
           </f7-swipeout-actions>
-          <f7-swipeout-actions left v-if="props.item.checkInTime < 0">
+          <f7-swipeout-actions left v-if="props.item.checkInTime < 0 && currentEvent.status < 2">
             <f7-swipeout-button close overswipe color="blue" @click="addSwiped(props.item.student)">Add
             </f7-swipeout-button>
           </f7-swipeout-actions>
@@ -256,7 +256,7 @@
             this.connectCallbackUnsubscriber = this.smart.onConnect((reader) => {
                 console.log(self.currentEvent)
                 reader.onInsert((card) => {
-                    if (self.pageActive && self.currentEvent) {
+                    if (self.pageActive && self.currentEvent && self.currentEvent.status < 2) {
                         self.addRecord(card.atr)
                     }
                 })

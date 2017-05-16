@@ -229,6 +229,7 @@ const actions = {
                         cachedEvent.id !== remoteEvent.id ||
                         cachedEvent.description !== remoteEvent.description ||
                         cachedEvent.time !== remoteEvent.time ||
+                        cachedEvent.status !== remoteEvent.status ||
                         !compareRecords(cachedEvent.records, records)
                     ) {
                         commit(types.PATCH_EVENT, {event: cachedEvent, patch: remoteEvent})
@@ -338,7 +339,7 @@ const actions = {
             }
         }
     },
-    async addEventRecord ({commit, state, rootState}, {record}) {
+    async addEventRecord ({commit, state, rootState, dispatch}, {record}) {
         const currentEvent = state.currentEvent
 
         if (currentEvent.status > 1) {
@@ -359,6 +360,7 @@ const actions = {
         try {
             if (await checkApi.submitRecords(currentEvent, [record])) {
                 commit(types.ADD_EVENT_RECORD, {record})
+                // dispatch('pullCurrentEvent', {id: currentEvent.id})
             } else {
                 console.error('Unknown Error: some event record requests went wrong.', currentEvent, record)
             }

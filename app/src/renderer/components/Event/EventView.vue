@@ -50,10 +50,11 @@
                 return this.currentEvent ? this.currentEvent.name : ''
             },
             ...mapGetters([
-                'currentEvent'
+                'currentEvent',
+                'offline'
             ]),
             displayComplete () {
-                return this.currentEvent && !(this.currentEvent instanceof LocalEvent) && this.currentEvent.status < 2
+                return this.currentEvent && this.currentEvent.status < 2 && !(this.currentEvent instanceof LocalEvent) && !this.offline
             }
         },
         methods: {
