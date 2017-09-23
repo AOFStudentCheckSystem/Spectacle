@@ -164,7 +164,7 @@
                 }
             },
             formatTime (time) {
-                return moment(time).format('ddd, MMM Mo YYYY HH:mm')
+                return moment(time).format('ddd, MMM Do YYYY HH:mm')
             }
         },
         computed: {
