@@ -52,7 +52,7 @@ class SmartCardInternal {
         this.errorCallbacks = {}
         this.readers = {}
 
-        const pcsclite = require('@pokusew/pcsclite')
+        const pcsclite = require('@codetector/pcsclite')
         const pcsc = pcsclite()
 
         const self = this

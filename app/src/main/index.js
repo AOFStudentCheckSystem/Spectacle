@@ -17,7 +17,7 @@ function createWindow () {
         webPreferences: {
             scrollBounce: true
         },
-        frame: false,
+        frame: process.env.NODE_ENV === 'development',
         title: 'Spectacle',
         fullscreen: process.env.NODE_ENV !== 'development'
     })

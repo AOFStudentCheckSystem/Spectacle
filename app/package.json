@@ -4,11 +4,11 @@
   "description": "a spectacular event viewer",
   "scripts": {
     "rebuild": "yarn rebuild:pcsclite",
-    "rebuild:pcsclite": "( cd node_modules/@pokusew/pcsclite && node-gyp rebuild --runtime=electron --target=1.6.2 --disturl=https://atom.io/download/atom-shell --abi=53 )"
+    "rebuild:pcsclite": "( cd node_modules/@codetector/pcsclite && node-gyp rebuild --runtime=electron --target=1.6.2 --disturl=https://atom.io/download/atom-shell --abi=53 )"
   },
   "main": "./dist/main.js",
   "dependencies": {
-    "@pokusew/pcsclite": "^0.4.17",
+    "@codetector/pcsclite": "^0.4.19",
     "axios": "^0.16.1",
     "font-awesome": "^4.7.0",
     "framework7": "^1.6.0",
