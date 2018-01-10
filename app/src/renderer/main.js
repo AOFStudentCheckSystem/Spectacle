@@ -60,29 +60,35 @@ export const http = axios.create({
     headers: {
         Authorization: ''
     },
-    transformRequest: [data => {
-        // iView.LoadingBar.start()
-        if (data) {
-            return Object.keys(data).map(key => {
-                return {key: key, value: data[key]}
-            }).reduce((formData, entry) => {
-                const value = entry.value
-                if (value !== undefined && value !== null) {
-                    switch (typeof value) {
-                        case 'object':
-                            formData.append(entry.key, JSON.stringify(value))
-                            break
-                        default:
-                            formData.append(entry.key, value)
-                            break
-                    }
-                }
-                return formData
-            }, new FormData())
-        } else {
-            return data
-        }
-    }],
+    // transformRequest: [(data, headers) => {
+    //     // iView.LoadingBar.start()
+    //     // if (data) {
+    //     //     return Object.keys(data).map(key => {
+    //     //         return {key: key, value: data[key]}
+    //     //     }).reduce((formData, entry) => {
+    //     //         const value = entry.value
+    //     //         if (value !== undefined && value !== null) {
+    //     //             switch (typeof value) {
+    //     //                 case 'object':
+    //     //                     formData.append(entry.key, JSON.stringify(value))
+    //     //                     break
+    //     //                 default:
+    //     //                     formData.append(entry.key, value)
+    //     //                     break
+    //     //             }
+    //     //         }
+    //     //         return formData
+    //     //     }, new FormData())
+    //     // } else {
+    //     //     return data
+    //     // }
+    //     if (typeof data === 'object') {
+    //         headers['Content-Type'] = 'application/json;charset=UTF-8'
+    //         return JSON.stringify(data)
+    //     } else {
+    //         return data
+    //     }
+    // }],
     transformResponse: [data => {
         // iView.LoadingBar.finish()
         return data ? JSON.parse(data) : data

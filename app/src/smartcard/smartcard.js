@@ -4,7 +4,7 @@
 import * as hexify from 'hexify'
 
 export class SmartCardController {
-    constructor() {
+    constructor () {
         this.__internal = new SmartCardInternal()
     }
 
@@ -13,7 +13,7 @@ export class SmartCardController {
      * @param callback
      * @returns () unsubscribe function
      */
-    onConnect(callback) {
+    onConnect (callback) {
         const callbackId = this.__internal.addConnectCallback(callback)
         const self = this
         return () => self.removeConnectCallback(callbackId)
@@ -24,7 +24,7 @@ export class SmartCardController {
      * @param callback
      * @returns () unsubscribe function
      */
-    onError(callback) {
+    onError (callback) {
         const callbackId = this.__internal.addErrorCallback(callback)
         const self = this
         return () => self.removeErrorCallback(callbackId)
@@ -33,21 +33,21 @@ export class SmartCardController {
     /**
      * frees up resources, make sure you clean up!
      */
-    close() {
+    close () {
         this.__internal.close()
     }
 
-    removeConnectCallback(id) {
+    removeConnectCallback (id) {
         this.__internal.removeConnectCallback(id)
     }
 
-    removeErrorCallback(id) {
+    removeErrorCallback (id) {
         this.__internal.removeErrorCallback(id)
     }
 }
 
 class SmartCardInternal {
-    constructor() {
+    constructor () {
         this.callbackId = 0
         this.connectCallbacks = {}
         this.errorCallbacks = {}
@@ -72,31 +72,31 @@ class SmartCardInternal {
         this.pcsc = pcsc
     }
 
-    addConnectCallback(callback) {
+    addConnectCallback (callback) {
         this.connectCallbacks[this.callbackId++] = callback
         return this.callbackId
     }
 
-    addErrorCallback(callback) {
+    addErrorCallback (callback) {
         this.errorCallbacks[this.callbackId++] = callback
         return this.callbackId
     }
 
-    close() {
+    close () {
         this.pcsc.close()
     }
 
-    removeConnectCallback(id) {
+    removeConnectCallback (id) {
         delete this.connectCallbacks[id]
     }
 
-    removeErrorCallback(id) {
+    removeErrorCallback (id) {
         delete this.errorCallbacks[id]
     }
 }
 
 export class Reader {
-    constructor(name, pcscliteReader) {
+    constructor (name, pcscliteReader) {
         this.name = name
         this.__internal = new ReaderInternal(pcscliteReader)
     }
@@ -106,7 +106,7 @@ export class Reader {
      * @param callback
      * @returns insert callback id
      */
-    onInsert(callback) {
+    onInsert (callback) {
         return this.__internal.addInsertCallback(callback)
     }
 
@@ -115,7 +115,7 @@ export class Reader {
      * @param callback
      * @returns remove callback id
      */
-    onEmpty(callback) {
+    onEmpty (callback) {
         return this.__internal.addEmptyCallback(callback)
     }
 
@@ -124,7 +124,7 @@ export class Reader {
      * @param callback
      * @returns error callback id
      */
-    onError(callback) {
+    onError (callback) {
         return this.__internal.addErrorCallback(callback)
     }
 
@@ -133,20 +133,20 @@ export class Reader {
      * @param callback
      * @returns end callback id
      */
-    onEnd(callback) {
+    onEnd (callback) {
         return this.__internal.addEndCallback(callback)
     }
 
     /**
      * frees up resources, make sure to do this!
      */
-    close() {
+    close () {
         this.__internal.close()
     }
 }
 
 class ReaderInternal {
-    constructor(pcscliteReader) {
+    constructor (pcscliteReader) {
         this.callbackId = 0
         this.insertCallbacks = {}
         this.emptyCallbacks = {}
@@ -206,27 +206,27 @@ class ReaderInternal {
         this.internalReader = pcscliteReader
     }
 
-    addInsertCallback(callback) {
+    addInsertCallback (callback) {
         this.insertCallbacks[this.callbackId++] = callback
         return this.callbackId
     }
 
-    addEmptyCallback(callback) {
+    addEmptyCallback (callback) {
         this.emptyCallbacks[this.callbackId++] = callback
         return this.callbackId
     }
 
-    addErrorCallback(callback) {
+    addErrorCallback (callback) {
         this.errorCallbacks[this.callbackId++] = callback
         return this.callbackId
     }
 
-    addEndCallback(callback) {
+    addEndCallback (callback) {
         this.endCallbacks[this.callbackId++] = callback
         return this.callbackId
     }
 
-    async transmit(card, apduCommand) {
+    async transmit (card, apduCommand) {
         let buffer
 
         if (Array.isArray(apduCommand)) {
@@ -254,7 +254,7 @@ class ReaderInternal {
         })
     }
 
-    close() {
+    close () {
         console.debug('[INFO] Reader(', this.internalReader.name, '):', 'removed')
         Object.values(this.endCallbacks).forEach((e) => e())
         this.internalReader.close()
@@ -262,7 +262,7 @@ class ReaderInternal {
 }
 
 export class Card {
-    constructor(protocol, atr) {
+    constructor (protocol, atr) {
         this.protocol = protocol
         this.atr = atr
     }

@@ -14,8 +14,8 @@ const state = {
 
 const mutations = {
     [types.SET_USER_TOKEN] (state, {token}) {
-        http.defaults.headers = {Authorization: token ? token.token : null}
-        rawHttp.defaults.headers = {Authorization: token ? token.token : null}
+        http.defaults.headers = {Authorization: token ? token.sessionKey : null}
+        rawHttp.defaults.headers = {Authorization: token ? token.sessionKey : null}
         state.token = token
     },
     [types.SET_OFFLINE] (state, {offline}) {
@@ -49,10 +49,10 @@ const getters = {
         return state.online
     },
     isAdmin (state) {
-        return state.token ? state.token.user.isAuthorized(1000) : false
+        return state.token ? state.token.isAuthorized('ADMIN_TABLET') : false
     },
     isTablet (state) {
-        return state.token ? state.token.user.isAuthorized(900) : false
+        return state.token ? state.token.isAuthorized('TABLET') : false
     }
 }
 
@@ -60,7 +60,7 @@ const actions = {
     async authenticate ({commit}, {email, password}) {
         commit(types.SET_SIGNING_IN, {signingIn: true})
         const userToken = await api.authenticate(email, password)
-        if (userToken.user.isAuthorized(900)) {
+        if (userToken.isAuthorized('TABLET')) {
             commit(types.SET_USER_TOKEN, {token: userToken})
         } else {
             throw new Error('Unauthorized')
