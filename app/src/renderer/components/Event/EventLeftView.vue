@@ -96,8 +96,8 @@
               <div class="item-title-row">
                 <div class="item-title">{{props.item.name}}</div>
                 <div class="item-after"><span class="badge"
-                                              :class="props.item.status == 0 ? 'color-blue' : props.item.status === 1 ? 'color-red' : 'color-green'">
-                  {{props.item.status == 0 ? 'Future' : props.item.status === 1 ? 'Boarding' : 'Complete'}}</span>
+                                              :class="computeClassForEvent(props.item)">
+                  {{firstCapString(props.item.status)}}</span>
                 </div>
               </div>
               <div class="item-subtitle">
@@ -113,7 +113,7 @@
 
 <script>
     import {mapActions, mapGetters} from 'vuex'
-    import {ActivityEvent, LocalEvent} from '../../models/event'
+    import {ActivityEvent, LocalEvent, EventStatus} from '../../models/event'
     import {EventBusMixin} from '../../mixins/event-bus'
     import moment from 'moment'
     import SearchBar from '../Master/SearchBar.vue'
@@ -168,7 +168,13 @@
                 }
             },
             formatTime (time) {
-                return moment(time).format('ddd, MMM Do YYYY HH:mm')
+                return moment.unix(time).format('ddd, MMM Do YYYY HH:mm')
+            },
+            computeClassForEvent (event) {
+                return event.status === EventStatus.FUTURE ? 'color-blue' : event.status === EventStatus.BOARDING ? 'color-red' : 'color-green'
+            },
+            firstCapString (str) {
+                return str.charAt(0).toUpperCase() + str.toLowerCase().slice(1)
             }
         },
         computed: {
@@ -179,7 +185,7 @@
             filteredEvents () {
                 const filter = this.filter
                 return this.filter === '' ? this.mergedEvents : this.mergedEvents.filter((event) => {
-                    const status = (event.status === 0 ? 'Future' : event.status === 1 ? 'Boarding' : 'Complete')
+                    const status = (event.status === EventStatus.FUTURE ? 'Future' : event.status === EventStatus.BOARDING ? 'Boarding' : 'Complete')
                     return event.name.toLowerCase().includes(filter) || status.toLowerCase().includes(filter)
                 })
             }
