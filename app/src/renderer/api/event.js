@@ -11,7 +11,7 @@ export default {
         return (new EventPage((await http.get(`event/list?page=${page}&size=${size}&sort=eventTime,desc`)).data))
     },
     async listAllEvents () {
-        return (await http.get('checkin/event/listall')).data.content.map((rawJson) => new ActivityEvent(rawJson))
+        return (await http.get('checkin/event/listall')).data.map((rawJson) => new ActivityEvent(rawJson))
         // return (new EventPage((await http.get(`event/list?page=${page}&size=${size}&sort=eventTime,desc`)).data))
     },
     async pullEvent (id) {
