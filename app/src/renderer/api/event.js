@@ -15,10 +15,10 @@ export default {
         // return (new EventPage((await http.get(`event/list?page=${page}&size=${size}&sort=eventTime,desc`)).data))
     },
     async pullEvent (id) {
-        return new ActivityEvent((await http.get('event/list/' + id)).data)
+        return new ActivityEvent((await http.get('/checkin/event/' + id)).data)
     },
     async createEvent (localEvent) {
-        const result = (await http.post('event/create', localEvent)).data
+        const result = (await http.put('/checkin/event', localEvent)).data
         if (result.success) {
             return result.newEvent.eventId
         } else {
@@ -26,12 +26,12 @@ export default {
         }
     },
     async editEvent (localEvent, patch) {
-        return new ActionResult((await http.post('event/edit', {
+        return new ActionResult((await http.post('/checkin/event/', {
             eventId: localEvent.id,
-            newTime: patch.time,
-            newName: patch.name,
-            newDescription: patch.description,
-            newStatus: patch.status
+            time: patch.time,
+            name: patch.name,
+            description: patch.description,
+            status: patch.status
         })).data)
     },
     async creditEvent (localEvent) {

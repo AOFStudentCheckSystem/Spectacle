@@ -46,7 +46,8 @@
     import {mapActions, mapGetters} from 'vuex'
     import * as PickerUtil from '../../util/picker'
     import {debounce} from '../../util/suppress'
-    import {ActivityEvent} from '../../models/event'
+    import {ActivityEvent, EventStatus} from '../../models/event'
+    import moment from 'moment'
 
     export default {
         data () {
@@ -77,7 +78,7 @@
                 'isAdmin'
             ]),
             disabled () {
-                return this.currentEvent ? this.currentEvent.status > 1 : true
+                return this.currentEvent ? (!this.isUnlockedEvent(this.currentEvent)) : true
             },
             displayedDate () {
                 if (this.calendar) {
@@ -94,7 +95,7 @@
                 }
             },
             emailEnabled () {
-                return this.currentEvent && this.currentEvent instanceof ActivityEvent && (this.currentEvent.status > 1 || this.isAdmin)
+                return this.currentEvent && this.currentEvent instanceof ActivityEvent && ((!this.isUnlockedEvent(this.currentEvent)) || this.isAdmin)
             },
             sendButtonDisabled () {
                 return !this.emailAddress.match(/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/)
@@ -104,6 +105,9 @@
             ...mapActions([
                 'emailEvent'
             ]),
+            isUnlockedEvent (event) {
+                return event.status !== EventStatus.COMPLETED
+            },
             onEmailSend () {
                 if (this.emailAddress && this.currentEvent) {
                     const currentEvent = this.currentEvent
@@ -175,7 +179,7 @@
                 this.picker = null
             },
             editName (event, name) {
-                if (event.status < 2) {
+                if (this.isUnlockedEvent(event)) {
                     this.$store.dispatch('patchEvent', {
                         event,
                         patch: {
@@ -185,7 +189,7 @@
                 }
             },
             editDescription (event, description) {
-                if (event.status < 2) {
+                if (this.isUnlockedEvent(event)) {
                     this.$store.dispatch('patchEvent', {
                         event,
                         patch: {
@@ -196,11 +200,11 @@
             },
             editTime (event, time) {
                 if (event) {
-                    if (event.status < 2) {
+                    if (this.isUnlockedEvent(event)) {
                         this.$store.dispatch('patchEvent', {
                             event,
                             patch: {
-                                time: time
+                                time: moment(time).unix()
                             }
                         })
                     }
@@ -215,8 +219,8 @@
                 if (newVal) {
                     this.name = newVal.name
                     this.description = newVal.description
-                    const date = new Date(newVal.time)
-                    const oldDate = oldVal ? new Date(oldVal.time) : null
+                    const date = new Date(moment.unix(newVal.time).valueOf())
+                    const oldDate = oldVal ? new Date(moment.unix(oldVal.time).valueOf()) : null
                     if (date && (!oldDate || date.getTime() !== oldDate.getTime())) {
                         this.pickerValue = {
                             hour: date.getHours(),

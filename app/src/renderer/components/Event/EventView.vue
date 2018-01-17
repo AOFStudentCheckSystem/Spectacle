@@ -16,7 +16,7 @@
             </f7-nav-left>
             <f7-nav-center sliding>{{ computedTitle }}</f7-nav-center>
             <f7-nav-right v-if="currentEvent">
-                <f7-link href="/event/check/">{{ currentEvent && currentEvent.status < 2 ? 'Check In' : 'View Records'}}</f7-link>
+                <f7-link href="/event/check/">{{ currentEvent && isUnlockedEvent(currentEvent) ? 'Check In' : 'View Records'}}</f7-link>
             </f7-nav-right>
         </f7-navbar>
         <f7-pages>
@@ -29,7 +29,7 @@
     import DetailPage from './DetailPage.vue'
     import {EventBusMixin} from '../../mixins/event-bus'
     import {mapGetters} from 'vuex'
-    import {LocalEvent} from '../../models/event'
+    import {EventStatus, LocalEvent} from '../../models/event'
 
     export default {
         mixins: [EventBusMixin],
@@ -54,10 +54,13 @@
                 'offline'
             ]),
             displayComplete () {
-                return this.currentEvent && this.currentEvent.status < 2 && !(this.currentEvent instanceof LocalEvent) && !this.offline
+                return this.currentEvent && this.isUnlockedEvent(this.currentEvent) && !(this.currentEvent instanceof LocalEvent) && !this.offline
             }
         },
         methods: {
+            isUnlockedEvent (event) {
+                return event.status !== EventStatus.COMPLETED
+            },
             onTabHidden () {
                 this.$publish(this.$channels.EVENT_TAB_SHOW, {status: false})
             },
@@ -88,7 +91,7 @@
                         self.$store.dispatch('patchEvent', {
                             event: currentEvent,
                             patch: {
-                                status: 2
+                                status: EventStatus.COMPLETED
                             }
                         })
                     })

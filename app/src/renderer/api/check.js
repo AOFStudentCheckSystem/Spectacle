@@ -6,11 +6,11 @@ import {ActivityEventRecord} from '../models/event'
 
 export default {
     async getRecords (id) {
-        return (await http.get('checkin/record/' + id)).data.records
+        return (await http.get('/checkin/checkin/record/' + id)).data
             .map((json) => new ActivityEventRecord(json))
     },
     async submitRecords (event, records) {
-        const result = (await rawHttp.put('checkin/submit', {
+        const result = (await rawHttp.put('/checkin/checkin/submit', {
             targetEvent: event.id,
             recordsToUpload: records.map((recordObj) => {
                 return {

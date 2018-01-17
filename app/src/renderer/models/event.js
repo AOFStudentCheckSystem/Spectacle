@@ -2,6 +2,8 @@
  * Created by dummy on 4/8/17.
  */
 import {Student} from './student'
+import moment from 'moment'
+
 export class EventGroup {
     constructor (json) {
         this.id = json.id
@@ -14,11 +16,18 @@ export class ActivityEvent {
     constructor (json) {
         this.id = json.id === 0 ? json.id : json.id || json.eventId
         this.name = json.name || json.eventName
-        this.time = new Date(json.time === 0 ? json.time : json.time || json.eventTime).getTime()
-        this.status = json.status === 0 ? json.status : json.status || json.eventStatus
+        this.time = moment.unix(json.time === 0 ? json.time : json.time || json.eventTime).unix()
+        this.status = json.status === EventStatus.FUTURE ? json.status : json.status || json.eventStatus
         this.description = json.description || json.eventDescription
         this.records = json.records ? json.records.map((rawRecords) => new ActivityEventRecord(rawRecords)) : []
     }
+
+}
+
+export const EventStatus = {
+    FUTURE: 'FUTURE',
+    BOARDING: 'BOARDING',
+    COMPLETED: 'COMPLETED'
 }
 
 export class ActivityEventRecord {
@@ -49,7 +58,7 @@ export class LocalEvent {
             this.localId = String(Math.random())
             this.name = ''
             this.time = new Date().getTime()
-            this.status = 0
+            this.status = EventStatus.FUTURE
             this.description = ''
             this.records = []
         }
