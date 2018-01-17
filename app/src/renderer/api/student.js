@@ -26,6 +26,6 @@ export default {
         })).data)
     },
     async pullStudent (id) {
-        return new Student((await http.get('student/list/' + id)).data)
+        return new Student((await http.get('student/' + id)).data)
     }
 }

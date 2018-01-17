@@ -63,7 +63,9 @@ const getters = {
 const actions = {
     async refreshStudents ({commit, rootState}) {
         if (!rootState.auth.offline) {
-            commit(types.SET_ALL_STUDENTS, {students: await api.listAllStudents()})
+            let students = await api.listAllStudents()
+            console.log(students)
+            commit(types.SET_ALL_STUDENTS, {students: students})
         }
     },
     async pullCurrentStudent ({commit, dispatch, state, rootState}, {id}) {
