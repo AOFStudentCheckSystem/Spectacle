@@ -1,10 +1,11 @@
 /**
  * Created by dummy on 4/8/17.
  */
-import { http } from '../main'
-import { EventPage } from '../models/event_page'
+import {http} from '../main'
+import {EventPage} from '../models/event_page'
 import {ActivityEvent} from '../models/event'
 import {ActionResult} from '../models/result'
+import moment from 'moment'
 
 export default {
     async pagedEvents (page, size) {
@@ -18,11 +19,20 @@ export default {
         return new ActivityEvent((await http.get('/checkin/event/' + id)).data)
     },
     async createEvent (localEvent) {
-        const result = (await http.put('/checkin/event', localEvent)).data
-        if (result.success) {
-            return result.newEvent.eventId
-        } else {
-            return new ActionResult(result)
+        // Transform Local Event Into an acceptable event creation request.
+
+        let remoteEvent = {
+            name: localEvent.name,
+            status: localEvent.status,
+            time: moment(localEvent.time).unix(),
+            description: localEvent.description
+        }
+
+        try {
+            const result = (await http.put('/checkin/event/', remoteEvent)).data
+            return result.eventId
+        } catch (e) {
+            return new ActionResult({success: false, error: e})
         }
     },
     async editEvent (localEvent, patch) {
