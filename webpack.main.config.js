@@ -42,7 +42,8 @@ let mainConfig = {
         new webpack.NoEmitOnErrorsPlugin(),
         new webpack.DefinePlugin({
             'process.env.NODE_ENV': '"production"',
-            'process.env.SERVER_URL': '"https://check.guardiantech.com.cn/"'
+            'process.env.SERVER_URL': '"https://check.guardiantech.com.cn/"',
+            'process.env.spectacle.version': '"2.0 Beta 1"'
         }),
         new webpack.optimize.UglifyJsPlugin({
             compress: {

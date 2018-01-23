@@ -18,6 +18,7 @@
       <f7-list-button :disabled="!online" @click="authenticationClicked" :title="authenticationTitle"></f7-list-button>
     </f7-list>
     <f7-block-title class="center">Built by Yaotian Feng, Peiqi Liu, Yuanchu Xie with ♥</f7-block-title>
+    <f7-block-title class="center">Version: {{version}} Built On:</f7-block-title>
   </f7-page>
 </template>
 
@@ -49,6 +50,9 @@
             },
             verboseTitle () {
                 return this.verbose ? 'Disable Verbose Logging' : 'Enable Verbose Logging'
+            },
+            version () {
+                return process.env.spectacle.version
             }
         },
         methods: {

@@ -15,15 +15,23 @@ export default {
         }, patch))).data)
     },
     async clearRfid (student) {
-        return new ActionResult((await http.post('student/edit/clear-card', {
-            studentId: student.idNumber
-        })).data)
+        try {
+            await http.delete('student/card/' + student.idNumber)
+            return new ActionResult({success: true, error: null})
+        } catch (e) {
+            return new ActionResult({success: false, error: 'unknown'})
+        }
     },
     async bindCardWithStudent (student, cardSecret) {
-        return new ActionResult((await http.post('student/edit/bind-card', {
-            studentId: student.idNumber,
-            cardSecret: cardSecret
-        })).data)
+        try {
+            await http.put('/student/card/', {
+                idNumber: student.idNumber,
+                cardSecret: cardSecret
+            })
+            return new ActionResult({success: true, error: null})
+        } catch (e) {
+            return new ActionResult({success: false, error: 'unknown'})
+        }
     },
     async pullStudent (id) {
         return new Student((await http.get('student/' + id)).data)

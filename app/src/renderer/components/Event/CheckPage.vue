@@ -34,7 +34,7 @@
                         <f7-list-item :title="'Records: ' + amountRecords"></f7-list-item>
                         <f7-list-item :title="'Add: ' + amountAdd"></f7-list-item>
                         <f7-list-item :title="'Remove: ' + amountRemove"></f7-list-item>
-                        <li class="media-item" v-if="currentEvent && currentEvent.status < 2">
+                        <li class="media-item" v-if="currentEvent &&  isUnlockedEvent(currentEvent)">
                             <div class="item-content">
                                 <div class="item-inner">
                                     <div class="item-title-row">
@@ -84,11 +84,11 @@
                     <!--<div class="swipeout-actions-right" v-if="props.item.checkInTime >= 0">-->
                     <!--<a class="swipeout-close swipeout-overswipe bg-red" href="#">Remove</a>-->
                     <!--</div>-->
-                    <f7-swipeout-actions right v-if="props.item.checkInTime >= 0 && currentEvent.status < 2">
+                    <f7-swipeout-actions right v-if="props.item.checkInTime >= 0 && isUnlockedEvent(currentEvent)">
                         <f7-swipeout-button close overswipe color="red" @click="removeSwiped(props.item.student)">Remove
                         </f7-swipeout-button>
                     </f7-swipeout-actions>
-                    <f7-swipeout-actions left v-if="props.item.checkInTime < 0 && currentEvent.status < 2">
+                    <f7-swipeout-actions left v-if="props.item.checkInTime < 0 && isUnlockedEvent(currentEvent)">
                         <f7-swipeout-button close overswipe color="blue" @click="addSwiped(props.item.student)">Add
                         </f7-swipeout-button>
                     </f7-swipeout-actions>
@@ -263,9 +263,8 @@
                 console.log(error)
             })
             this.connectCallbackUnsubscriber = this.smart.onConnect((reader) => {
-                console.log(self.currentEvent)
                 reader.onInsert((card) => {
-                    if (self.pageActive && self.currentEvent && self.currentEvent.status < 2) {
+                    if (self.pageActive && self.currentEvent && self.isUnlockedEvent(self.currentEvent)) {
                         self.addRecord(card.atr)
                     }
                 })

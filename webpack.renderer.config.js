@@ -91,7 +91,8 @@ let rendererConfig = {
         new webpack.DefinePlugin({
             'process.env.SERVER_URL': process.env.NODE_ENV !== 'production'
                 ? '"http://127.0.0.1:9080/"' // Development Server
-                : '"https://api.aofactivities.com/"' // Production Server
+                : '"https://api.aofactivities.com/"', // Production Server
+            'process.env.spectacle.version': '"DEVELOPMENT"'
         })
     ],
     output: {
