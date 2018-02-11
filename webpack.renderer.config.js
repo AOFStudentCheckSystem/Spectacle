@@ -90,7 +90,7 @@ let rendererConfig = {
         new webpack.NoEmitOnErrorsPlugin(),
         new webpack.DefinePlugin({
             'process.env.SERVER_URL': process.env.NODE_ENV !== 'production'
-                ? '"http://127.0.0.1:9080/"' // Development Server
+                ? '"http://hn2.guardiantech.com.cn:19080/"' // Development Server
                 : '"https://api.aofactivities.com/"', // Production Server
             'process.env.spectacle.version': '"DEVELOPMENT"'
         })

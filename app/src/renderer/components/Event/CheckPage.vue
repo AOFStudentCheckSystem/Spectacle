@@ -106,6 +106,7 @@
     import {EventBusMixin} from '../../mixins/event-bus'
     import SearchBar from '../Master/SearchBar.vue'
     import SearchBarOverlay from '../Master/SearchBarOverlay.vue'
+    import moment from 'moment'
 
     export default {
         mixins: [EventBusMixin],
@@ -174,7 +175,7 @@
                         record: new ActivityEventRecord({
                             student: student,
                             signUpTime: -1,
-                            checkInTime: -(new Date().getTime())
+                            checkInTime: -(moment().unix())
                         })
                     })
                     this.$forceUpdate()
@@ -186,7 +187,7 @@
                         record: new ActivityEventRecord({
                             student: student,
                             signUpTime: -1,
-                            checkInTime: new Date().getTime()
+                            checkInTime: moment().unix()
                         })
                     })
                     this.$forceUpdate()
