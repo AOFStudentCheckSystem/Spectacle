@@ -139,11 +139,7 @@ const getters = {
 const actions = {
     async emailEvent ({rootState}, {event, email}) {
         if (!rootState.auth.offline && event instanceof ActivityEvent) {
-            const result = await api.sendMail(event.id, email)
-            if (!result.success) {
-                console.log(result)
-                throw result.error
-            }
+            await api.sendMail(event.id, email)
         }
     },
     async createEvent ({commit, rootState, dispatch}, {event}) {

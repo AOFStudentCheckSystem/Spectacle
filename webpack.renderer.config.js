@@ -90,8 +90,9 @@ let rendererConfig = {
         new webpack.NoEmitOnErrorsPlugin(),
         new webpack.DefinePlugin({
             'process.env.SERVER_URL': process.env.NODE_ENV !== 'production'
-                ? '"http://hn2.guardiantech.com.cn:19080/"' // Development Server
-                : '"https://api.aofactivities.com/"', // Production Server
+                ? '"https://apiv2.aofportal.org/"' // Development Server
+                // ? '"http://localhost:9080/"' // Development Server
+                : '"https://apiv2.aofportal.org/"', // Production Server
             'process.env.spectacle.version': '"DEVELOPMENT"'
         })
     ],

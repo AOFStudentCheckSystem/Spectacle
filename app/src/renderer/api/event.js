@@ -44,19 +44,19 @@ export default {
             status: patch.status
         })).data)
     },
-    async creditEvent (localEvent) {
-        return new ActionResult((await http.post('event/credit', {
-            eventId: localEvent.id,
-            name: localEvent.name,
-            time: localEvent.time,
-            description: localEvent.description
-        })).data)
-    },
+    // async creditEvent (localEvent) {
+    //     return new ActionResult((await http.post('event/credit', {
+    //         eventId: localEvent.id,
+    //         name: localEvent.name,
+    //         time: localEvent.time,
+    //         description: localEvent.description
+    //     })).data)
+    // },
     async sendMail (eventId, emailAddress) {
-        return new ActionResult((await http.post('event/sendmail', {
+        return (await http.post('/checkin/event/sendmail', {
             eventId: eventId,
             address: emailAddress
-        })).data)
+        }).data)
     }
     // @RequestParam("eventId") eventID: String,
     // @RequestParam("newTime", required = false, defaultValue = "0") newTime: Long,
